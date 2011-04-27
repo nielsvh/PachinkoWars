@@ -12,3 +12,4 @@ public:
 	~Point3(void);
 	float x,y,z;
 };
+
