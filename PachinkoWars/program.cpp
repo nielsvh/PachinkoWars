@@ -1,19 +1,16 @@
 #include <stdlib.h>
 #include <GL/glut.h>
-#include <math.h>
-#include <time.h>
-#include <vector>
-#include <iostream>
-#include <fstream>
 #include <string>
 
 #include "include/AL/alut.h"
+#include "Table.h"
 
 using namespace std;
 
 
 #define FPS 1000/30
-#define fileName "PACHINKO.txt"
+
+Table table;
 
 void display(void)
 {
@@ -22,8 +19,8 @@ void display(void)
 	// position the camera far enough away so that a board of 16X16 will fill the entire screen
 	glTranslatef(0,-8,-9);
 	glColor3f(1.0, 1.0, 1.0);
-
-
+	glPointSize(3);
+	table.Draw();
 	
 	glPopMatrix();
 	glutSwapBuffers();
@@ -46,60 +43,55 @@ void animation(void)
 	glutPostRedisplay();
 }
 
-void FileIn() 
-{
-	string line;
-	fstream file;
-
-	file.open(fileName);
-	//Tests to see if file was found
-	if (!file)
-	{
-		cout << "Unable to open file\n";
-		//exit(1); // File could not be found, no points, exit the program
-	}
-
-	// the x and y of the start and end of a line as well as the vectors for curves
-	float x1, y1,vx1,vy1, x2, y2, vx2, vy2;
-
-	for(int i = 0; !file.eof(); i ++){
-
-		getline(file, line);
-
-		// step through line string and get the point info
-		char * pch = strtok ((char*)line.c_str()," ");
-
-		x1 = atof(pch);
-		pch = strtok (NULL, " ");
-
-		y1 = atof(pch);
-		pch = strtok (NULL, " ");
-
-		x2 = atof(pch);
-		pch = strtok (NULL, " ");
-
-		y2 = atof(pch);
-	}
-	file.close();
-}
-
 // Called each "frame" to update the game's components
 void GameTimer(int frame)
 {
-	// read in the file
-	//FileIn();
 	glutTimerFunc(frame, GameTimer, frame);
 	animation();
 }
 
+void playFile (const char *wavName)
+{
+	ALuint buffer;
+	ALuint source;
+	ALenum error;
+	ALint status;
+
+	/* Create an AL buffer from the given sound file. */
+	buffer = alutCreateBufferFromFile (wavName);
+	if (buffer == AL_NONE)
+	{
+		error = alutGetError ();
+		fprintf (stderr, "Error loading file: '%s'\n",
+			alutGetErrorString (error));
+		alutExit ();
+		exit (EXIT_FAILURE);
+	}
+
+	/* Generate a single source, attach the buffer to it and start playing. */
+	alGenSources (1, &source);
+	alSourcei (source, AL_BUFFER, buffer);
+	alSourcePlay (source);
+
+	/* Normally nothing should go wrong above, but one never knows... */
+	error = alGetError ();
+	if (error != ALUT_ERROR_NO_ERROR)
+	{
+		fprintf (stderr, "%s\n", alGetString (error));
+		alutExit ();
+		exit (EXIT_FAILURE);
+	}
+}
+
 void init(void) 
 {
+	table = Table();
 
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_FLAT);
 }
 
-//http://www.flipcode.com/archives/OpenGL_Camera.shtml
+
 void keyboardS (int key, int x, int y)
 {
 	switch(key)
@@ -134,8 +126,6 @@ void keyboardN(unsigned char key, int x, int y)
 
 int main(int argc, char** argv)
 {
-	ALuint helloBuffer, helloSource;
-	srand((unsigned)time(0));
 	glutInit(&argc, argv);
 	alutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
@@ -148,11 +138,6 @@ int main(int argc, char** argv)
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(keyboardS);
 	glutKeyboardFunc(keyboardN);
-
-	helloBuffer = alutCreateBufferHelloWorld ();
-	alGenSources (1, &helloSource);
-	alSourcei (helloSource, AL_BUFFER, helloBuffer);
-	alSourcePlay (helloSource);
 
 	glutMainLoop();
 	
