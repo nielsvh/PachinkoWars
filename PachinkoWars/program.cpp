@@ -3,11 +3,12 @@
 #include <math.h>
 #include <time.h>
 #include <vector>
-
-// basic file operations
 #include <iostream>
 #include <fstream>
 #include <string>
+
+#include "include/AL/alut.h"
+
 using namespace std;
 
 
@@ -86,7 +87,7 @@ void FileIn()
 void GameTimer(int frame)
 {
 	// read in the file
-	FileIn();
+	//FileIn();
 	glutTimerFunc(frame, GameTimer, frame);
 	animation();
 }
@@ -133,8 +134,10 @@ void keyboardN(unsigned char key, int x, int y)
 
 int main(int argc, char** argv)
 {
+	ALuint helloBuffer, helloSource;
 	srand((unsigned)time(0));
 	glutInit(&argc, argv);
+	alutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize (500, 500); 
 	glutInitWindowPosition (100, 100);
@@ -145,6 +148,19 @@ int main(int argc, char** argv)
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(keyboardS);
 	glutKeyboardFunc(keyboardN);
+
+	helloBuffer = alutCreateBufferHelloWorld ();
+	alGenSources (1, &helloSource);
+	alSourcei (helloSource, AL_BUFFER, helloBuffer);
+	alSourcePlay (helloSource);
+
 	glutMainLoop();
-	return 0;
+	
+	if (!alutExit ())
+	{
+		ALenum error = alutGetError ();
+		fprintf (stderr, "%s\n", alutGetErrorString (error));
+		exit (EXIT_FAILURE);
+	}
+	return EXIT_SUCCESS;
 }

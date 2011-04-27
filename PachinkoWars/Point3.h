@@ -1,6 +1,6 @@
 #pragma once
 #include <stdlib.h>
-#include <GL/glut.h>
+#include <gl/glut.h>
 #include <math.h>
 #include "Maths.h"
 
