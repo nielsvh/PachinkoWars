@@ -94,5 +94,8 @@
     <None Include="PACHINKO.txt">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Pachinko.rgb">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

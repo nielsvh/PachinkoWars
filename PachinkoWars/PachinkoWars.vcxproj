@@ -88,6 +88,7 @@
     <None Include="helloworld.wav">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="Pachinko.rgb" />
     <None Include="PACHINKO.txt" />
     <None Include="Sounds\BallDrop.wav" />
     <None Include="Sounds\CrabBattle.wav" />
