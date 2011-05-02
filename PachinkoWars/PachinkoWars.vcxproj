@@ -66,6 +66,7 @@
   <ItemGroup>
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Pin.cpp" />
+    <ClCompile Include="PinLineCurve.cpp" />
     <ClCompile Include="Point3.cpp" />
     <ClCompile Include="program.cpp" />
     <ClCompile Include="Quaternion.cpp" />
@@ -77,6 +78,7 @@
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Pin.h" />
+    <ClInclude Include="PinLineCurve.h" />
     <ClInclude Include="Point3.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="resource.h" />

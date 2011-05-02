@@ -11,5 +11,21 @@ public:
 	Point3(float newX, float newY, float newZ);
 	~Point3(void);
 	float x,y,z;
+
+	Point3& operator*(double rhs)
+	{
+		x*=rhs;
+		y*=rhs;
+		z*=rhs;
+		return *this;
+	}
+
+	Point3& operator+(Point3& rhs)
+	{
+		x += rhs.x;
+		y+=rhs.y;
+		z+=rhs.z;
+		return *this;
+	}
 };
 
