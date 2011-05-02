@@ -4,6 +4,7 @@
 #include <fstream>
 #include <gl/glut.h>
 #include "texture.h"
+#include "PinLineCurve.h"
 using namespace std;
 
 #define fileName "PACHINKO.txt"
@@ -16,5 +17,6 @@ public:
 	void init();
 	void FileIn();
 	void Draw();
+	vector<Pin*> pins;
 };
 

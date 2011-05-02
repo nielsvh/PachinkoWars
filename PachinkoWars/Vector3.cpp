@@ -28,7 +28,12 @@ Vector3& Vector3::cross(const Vector3& other) const
 
 float Vector3::getLength(void)
 {
-	return sqrt(x*x + y*y + z*z);
+	float ls = x*x + y*y + z*z;
+	if (ls<.0001)
+	{
+		return 0;
+	}
+	return sqrt(ls);
 }
 
 Vector3* Vector3::normalize(void)

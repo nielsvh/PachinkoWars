@@ -14,18 +14,20 @@ public:
 
 	Point3& operator*(double rhs)
 	{
-		x*=rhs;
-		y*=rhs;
-		z*=rhs;
-		return *this;
+		Point3* tmp = new Point3(*this);
+		tmp->x*=rhs;
+		tmp->y*=rhs;
+		tmp->z*=rhs;
+		return *tmp;
 	}
 
 	Point3& operator+(Point3& rhs)
 	{
-		x += rhs.x;
-		y+=rhs.y;
-		z+=rhs.z;
-		return *this;
+		Point3* tmp = new Point3(*this);
+		tmp->x += rhs.x;
+		tmp->y+=rhs.y;
+		tmp->z+=rhs.z;
+		return *tmp;
 	}
 };
 
