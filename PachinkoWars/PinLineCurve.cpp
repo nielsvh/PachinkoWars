@@ -23,7 +23,7 @@ vector<Pin*> PinLineCurve::GetCurvePins( Point3 p0, Point3 p1, Point3 p2, Point3
 
 		Vector3 v = p[i]-rtn.back()->position;
 		float l = v.getLength();
-		if (l >= .1)
+		if (l >= .2)
 		{
 			rtn.push_back(new Pin(p[i]));
 		}
@@ -37,12 +37,12 @@ vector<Pin*> PinLineCurve::GetLinePins( Point3 start, Point3 end )
 {
 	vector<Pin*> rtn;
 	Vector3 v = end-start;
-	int numSteps = v.getLength()/.6;
+	int numSteps = v.getLength()/.55;
 	v.normalize();
 	v = .6f * v;
 	Point3 c = start;
 	rtn.push_back(new Pin(c));
-	for (int i = 0;i<=numSteps;i++)
+	for (int i = 0;i<numSteps;i++)
 	{
 		rtn.push_back(new Pin(c+v));
 		c = c+v;

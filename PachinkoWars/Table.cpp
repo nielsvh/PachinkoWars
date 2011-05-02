@@ -64,7 +64,7 @@ void Table::FileIn()
 	}
 
 	// the x and y of the start and end of a line as well as the vectors for curves
-	float x1, y1,vx1,vy1, x2, y2, vx2, vy2;
+	float x1,x2,x3,x4,y1,y2,y3,y4;
 
 	for(int i = 0; !file.eof(); i ++){
 
@@ -92,13 +92,30 @@ void Table::FileIn()
 			pch = strtok (NULL, " ");
 
 			y2 = atof(pch);
-			xs[xp++] = (x1-2)/10.;
-			xs[xp++] = (x2-2)/10.;
+			pch = strtok (NULL, " ");
+
+			x3 = atof(pch);
+			pch = strtok (NULL, " ");
+
+			y3 = atof(pch);
+			pch = strtok (NULL, " ");
+
+			x4 = atof(pch);
+			pch = strtok (NULL, " ");
+
+			y4 = atof(pch);
+
+			xs[xp++] = (x1)/10.;
+			xs[xp++] = (x2)/10.;
+			xs[xp++] = (x3)/10.;
+			xs[xp++] = (x4)/10.;
 			ys[yp++] = (y1)/10.;
 			ys[yp++] = (y2)/10.;
+			ys[yp++] = (y3)/10.;
+			ys[yp++] = (y4)/10.;
 
-			/*vector<Pin*> tmp = PinLineCurve::GetCurvePins(Point3(xs[0], ys[0],0), Point3(xs[1], ys[1],0), Point3(xs[2], ys[2],0), Point3(xs[3], ys[3],0));
-			pins.insert(pins.end(),tmp.begin(), tmp.end());*/
+			vector<Pin*> tmpp = PinLineCurve::GetCurvePins(Point3(x1/10., y1/10.,0), Point3(x2/10., y2/10.,0),Point3(x3/10., y3/10.,0),Point3(x4/10., y4/10.,0));
+			pins.insert(pins.end(),tmpp.begin(), tmpp.end());
 		}
 		else if (line[0] == 'l')
 		{
@@ -116,8 +133,8 @@ void Table::FileIn()
 			pch = strtok (NULL, " ");
 
 			y2 = atof(pch);
-			xs[xp++] = (x1-2)/10.;
-			xs[xp++] = (x2-2)/10.;
+			xs[xp++] = x1/10.;
+			xs[xp++] = x2/10.;
 			ys[yp++] = (y1)/10.;
 			ys[yp++] = (y2)/10.;
 
@@ -139,13 +156,13 @@ void Table::Draw()
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 1);
 	glColor3f(1,1,1);
-	/*for (int i = 0; i < xp; i+=2)
+	for (int i = 0; i < xp; i+=2)
 	{
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(-xs[i]/10.f, ys[i]/10.f, 1);
-	glVertex3f(-xs[i+1]/10.f, ys[i+1]/10.f, 1);
+	glVertex3f(-xs[i], ys[i], 0);
+	glVertex3f(-xs[i+1], ys[i+1],0);
 	glEnd();
-	}*/
+	}
 
 	for (int i = 0;i<pins.size()-1;i++)
 	{
