@@ -64,22 +64,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Pin.cpp" />
     <ClCompile Include="PinLineCurve.cpp" />
     <ClCompile Include="Point3.cpp" />
     <ClCompile Include="program.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Pin.h" />
     <ClInclude Include="PinLineCurve.h" />
     <ClInclude Include="Point3.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Table.h" />
