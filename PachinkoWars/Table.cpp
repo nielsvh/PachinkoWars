@@ -48,6 +48,11 @@ void Table::init()
 
 	/*vector<Pin*> tmp = PinLineCurve::GetCurvePins(Point3(xs[0], ys[0],0), Point3(xs[1], ys[1],0), Point3(xs[2], ys[2],0), Point3(xs[3], ys[3],0));
 	pins.insert(pins.end(),tmp.begin(), tmp.end());*/
+
+	tree = QuadTree();
+
+	vector<GameObject*> tmp = vector<GameObject*>(pins.begin(), pins.end());
+	tree.BuildTree(tmp, new Point3(-8, 16, 0), 16.0, 16.0);
 }
 
 void Table::FileIn()
@@ -145,6 +150,10 @@ void Table::FileIn()
 	file.close();
 }
 
+void Table::Update()
+{
+}
+
 void Table::Draw()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -171,4 +180,6 @@ void Table::Draw()
 		glEnd();*/
 		pins[i]->Draw();
 	}
+
+	tree.Draw();
 }

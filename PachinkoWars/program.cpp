@@ -39,7 +39,7 @@ void reshape (int w, int h)
 
 void animation(void)
 {
-	// get the force from spring, calculate force of gravity on bar, imply the forces on the bar, calculate new positions of bar and spring
+	table.Update();
 	glutPostRedisplay();
 }
 

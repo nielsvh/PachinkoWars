@@ -5,6 +5,7 @@
 #include <gl/glut.h>
 #include "texture.h"
 #include "PinLineCurve.h"
+#include "QuadTree.h"
 using namespace std;
 
 #define fileName "PACHINKO.txt"
@@ -17,6 +18,8 @@ public:
 	void init();
 	void FileIn();
 	void Draw();
+	void Update();
 	vector<Pin*> pins;
+	QuadTree tree;
 };
 
