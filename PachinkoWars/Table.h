@@ -6,6 +6,7 @@
 #include "texture.h"
 #include "PinLineCurve.h"
 #include "QuadTree.h"
+#include "Ball.h"
 using namespace std;
 
 #define fileName "PACHINKO.txt"
@@ -20,6 +21,7 @@ public:
 	void Draw();
 	void Update();
 	vector<Pin*> pins;
+	vector<Ball*> balls;
 	QuadTree tree;
 };
 

@@ -17,14 +17,16 @@ void Table::init()
 {
 	int width, height;
 	int nComponents;
-	void* pTextureImage;
+	void* pTextureImage, *pTextureImage1;
 	pins = vector<Pin*>();
+	balls = vector<Ball*>();
+	balls.push_back(new Ball(Point3(0,8,0)));
 
 	//glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glShadeModel(GL_SMOOTH);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
 
 
 	pTextureImage = read_texture("back.rgb", &width, &height, &nComponents);
@@ -160,6 +162,7 @@ void Table::Update()
 
 void Table::Draw()
 {
+	glColor3f(1,1,1);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBegin(GL_QUADS);
 	glVertex3f(-8,16,0);     glTexCoord2f (0, 0);
@@ -167,23 +170,18 @@ void Table::Draw()
 	glVertex3f (8, 0, 0);    glTexCoord2f (1, 1);
 	glVertex3f (8,16,0);     glTexCoord2f (0, 1);
 	glEnd();
-	glBindTexture(GL_TEXTURE_2D, 1);
-	glColor3f(1,1,1);
-	/*for (int i = 0; i < xp; i+=2)
-	{
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(-xs[i], ys[i], 0);
-	glVertex3f(-xs[i+1], ys[i+1],0);
-	glEnd();
-	}*/
+	glBindTexture(GL_TEXTURE_2D, 2);
+
+	tree.Draw();
 
 	for (int i = 0;i<pins.size();i++)
 	{
-		/*glBegin(GL_POINTS);
-		glVertex3f(-pins[i]->position.x/10.f, pins[i]->position.y/10.f, 1);
-		glEnd();*/
 		pins[i]->Draw();
 	}
 
-	tree.Draw();
+	for (int i = 0;i<balls.size();i++)
+	{
+		balls[i]->Draw();
+	}
+	
 }

@@ -27,8 +27,8 @@ Pin::~Pin(void)
 }
 
 void Pin::Draw()
-{/*
-	glBegin(GL_LINE_LOOP);
+{
+	/*glBegin(GL_LINE_LOOP);
 	glVertex3f(points[0].x, points[0].y, points[0].z);
 	glVertex3f(points[2].x, points[2].y, points[2].z);
 	glVertex3f(points[3].x, points[3].y, points[3].z);

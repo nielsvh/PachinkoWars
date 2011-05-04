@@ -6,7 +6,7 @@ Vector3 Vector3::zAxis = Vector3(0,0,1);
 
 Vector3::Vector3(void)
 {
-	x =y=z=0;
+	x=y=z=0;
 }
 
 Vector3::Vector3(float _x, float _y, float _z):x(_x),y(_y),z(_z)
