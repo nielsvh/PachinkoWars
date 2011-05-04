@@ -34,11 +34,14 @@ void QuadTree::BuildTree( vector<GameObject*> objects, Point3* location, float w
 
 void QuadTree::SplitNode( MyNode* n, int steps )
 {
-	if (steps>3)
+	if (steps>4)
 	{
 		return;
 	}
-	n->tl = new MyNode();n->tr = new MyNode();n->bl = new MyNode();n->br = new MyNode();
+	n->tl = new MyNode();
+	n->tr = new MyNode();
+	n->bl = new MyNode();
+	n->br = new MyNode();
 
 	float w = n->width/2.0, h = n->height/2.0;
 
@@ -46,31 +49,40 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	n->tl->height = n->tr->height = n->bl->height = n->br->height = h;
 
 	//n->tl-> n->tr-> = n->bl-> = n->br-> = ;
-	n->tl->position = n->position;
-	n->tr->position = new Point3(n->position->x+w, n->position->y, n->position->z);
-	n->bl->position = new Point3(n->position->x, n->position->y-h, n->position->z);
-	n->br->position = new Point3(n->position->x+w, n->position->y-h, n->position->z);
+	n->bl->position = n->position;
+	n->br->position = new Point3(n->position->x+w, n->position->y, n->position->z);
 
-	n->tl->myObjects = new vector<GameObject*>();n->tr->myObjects = new vector<GameObject*>();n->bl->myObjects = new vector<GameObject*>();n->br->myObjects = new vector<GameObject*>();
+	n->tl->position = new Point3(n->position->x, n->position->y+h, n->position->z);
+	n->tr->position = new Point3(n->position->x+w, n->position->y+h, n->position->z);
+
+	n->tl->myObjects = new vector<GameObject*>();
+	n->tr->myObjects = new vector<GameObject*>();
+	n->bl->myObjects = new vector<GameObject*>();
+	n->br->myObjects = new vector<GameObject*>();
 	for (int i = 0;i<n->myObjects->size();i++)
 	{
-		if (myObjects[i]->position.x>=n->position->x+w)
+		GameObject* obj = (*n->myObjects)[i];
+		if ((*n->myObjects)[i]->position.x >= n->tr->position->x)
 		{
-			if (myObjects[i]->position.y>=n->position->y-h)
+			if ((*n->myObjects)[i]->position.y >= n->tr->position->y)
 			{
-				n->br->myObjects->push_back(myObjects[i]);
+				n->tr->myObjects->push_back((*n->myObjects)[i]);
 			}
 			else
-			n->tr->myObjects->push_back(myObjects[i]);
+			{
+				n->br->myObjects->push_back((*n->myObjects)[i]);
+			}
 		}
 		else
 		{
-			if (myObjects[i]->position.y>=n->position->y-h)
+			if ((*n->myObjects)[i]->position.y >= n->tl->position->y)
 			{
-				n->bl->myObjects->push_back(myObjects[i]);
+				n->tl->myObjects->push_back((*n->myObjects)[i]);
 			}
 			else
-			n->tl->myObjects->push_back(myObjects[i]);
+			{
+				n->bl->myObjects->push_back((*n->myObjects)[i]);
+			}
 		}
 	}
 	// for now don't remove objects from parent nodes
@@ -78,15 +90,16 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	n->tl->tree = n->tr->tree = n->bl->tree = n->br->tree = this;
 	
 	if (n->tl->myObjects->size()>TOLERANCE)
-	SplitNode(n->tl, ++steps);
-	if (n->tr->myObjects->size()>TOLERANCE)
-	SplitNode(n->tr, ++steps);
-	if (n->bl->myObjects->size()>TOLERANCE)
-		SplitNode(n->bl, ++steps);
-	if (n->br->myObjects->size()>TOLERANCE)
-		SplitNode(n->br, ++steps);
+		SplitNode(n->tl, steps+1);
 
-	return;
+	if (n->tr->myObjects->size()>TOLERANCE)
+		SplitNode(n->tr, steps+1);
+
+	if (n->bl->myObjects->size()>TOLERANCE)
+		SplitNode(n->bl, steps+1);
+
+	if (n->br->myObjects->size()>TOLERANCE)
+		SplitNode(n->br, steps+1);
 }
 
 void QuadTree::Draw()
@@ -100,8 +113,8 @@ void QuadTree::Draw( MyNode* n )
 	glBegin(GL_LINE_STRIP);
 	glVertex3f(n->position->x, n->position->y,n->position->z);
 	glVertex3f(n->position->x+n->width, n->position->y, n->position->z);
-	glVertex3f(n->position->x+n->width, n->position->y-n->height, n->position->z);
-	glVertex3f(n->position->x, n->position->y-n->height, n->position->z);
+	glVertex3f(n->position->x+n->width, n->position->y+n->height, n->position->z);
+	glVertex3f(n->position->x, n->position->y+n->height, n->position->z);
 	glEnd();
 	if (n->tr != NULL)
 	{

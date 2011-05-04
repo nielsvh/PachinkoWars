@@ -26,9 +26,8 @@ void Table::init()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	// Create texture for cube; load marble texture from file and bind it
 
-	pTextureImage = read_texture("pachinko.rgb", &width, &height, &nComponents);
+	pTextureImage = read_texture("back.rgb", &width, &height, &nComponents);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	gluBuild2DMipmaps(GL_TEXTURE_2D,     // texture to specify
 		GL_RGBA,           // internal texture storage format
@@ -52,7 +51,7 @@ void Table::init()
 	tree = QuadTree();
 
 	vector<GameObject*> tmp = vector<GameObject*>(pins.begin(), pins.end());
-	tree.BuildTree(tmp, new Point3(-8, 16, 0), 16.0, 16.0);
+	tree.BuildTree(tmp, new Point3(-8, 0, 0), 16.0, 16.0);
 }
 
 void Table::FileIn()
@@ -70,8 +69,9 @@ void Table::FileIn()
 
 	// the x and y of the start and end of a line as well as the vectors for curves
 	float x1,x2,x3,x4,y1,y2,y3,y4;
+	vector<Pin*> tmpp;
 
-	for(int i = 0; !file.eof(); i ++){
+	for(int i = 0; !file.eof(); i++){
 
 		getline(file, line);
 
@@ -119,7 +119,9 @@ void Table::FileIn()
 			ys[yp++] = (y3)/10.;
 			ys[yp++] = (y4)/10.;
 
-			vector<Pin*> tmpp = PinLineCurve::GetCurvePins(Point3(x1/10., y1/10.,0), Point3(x2/10., y2/10.,0),Point3(x3/10., y3/10.,0),Point3(x4/10., y4/10.,0));
+			tmpp = PinLineCurve::GetCurvePins(Point3(x1/10., y1/10.,0), Point3(x2/10., y2/10.,0),Point3(x3/10., y3/10.,0),Point3(x4/10., y4/10.,0));
+			pins.insert(pins.end(),tmpp.begin(), tmpp.end());
+			tmpp = PinLineCurve::GetCurvePins(Point3(-x1/10., y1/10.,0), Point3(-x2/10., y2/10.,0),Point3(-x3/10., y3/10.,0),Point3(-x4/10., y4/10.,0));
 			pins.insert(pins.end(),tmpp.begin(), tmpp.end());
 		}
 		else if (line[0] == 'l')
@@ -140,10 +142,12 @@ void Table::FileIn()
 			y2 = atof(pch);
 			xs[xp++] = x1/10.;
 			xs[xp++] = x2/10.;
-			ys[yp++] = (y1)/10.;
-			ys[yp++] = (y2)/10.;
+			ys[yp++] = y1/10.;
+			ys[yp++] = y2/10.;
 
-			vector<Pin*> tmpp = PinLineCurve::GetLinePins(Point3(x1/10.f, y1/10.f,0), Point3(x2/10.f, y2/10.f,0));
+			tmpp = PinLineCurve::GetLinePins(Point3(x1/10.f, y1/10.f,0), Point3(x2/10.f, y2/10.f,0));
+			pins.insert(pins.end(),tmpp.begin(), tmpp.end());
+			tmpp = PinLineCurve::GetLinePins(Point3(-x1/10.f, y1/10.f,0), Point3(-x2/10.f, y2/10.f,0));
 			pins.insert(pins.end(),tmpp.begin(), tmpp.end());
 		}
 	}
@@ -165,15 +169,15 @@ void Table::Draw()
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 1);
 	glColor3f(1,1,1);
-	for (int i = 0; i < xp; i+=2)
+	/*for (int i = 0; i < xp; i+=2)
 	{
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(-xs[i], ys[i], 0);
 	glVertex3f(-xs[i+1], ys[i+1],0);
 	glEnd();
-	}
+	}*/
 
-	for (int i = 0;i<pins.size()-1;i++)
+	for (int i = 0;i<pins.size();i++)
 	{
 		/*glBegin(GL_POINTS);
 		glVertex3f(-pins[i]->position.x/10.f, pins[i]->position.y/10.f, 1);

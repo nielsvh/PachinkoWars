@@ -59,6 +59,6 @@ void Pin::Draw()
 	glEnd();*/
 
 	glBegin(GL_POINTS);
-	glVertex3f(position.x, position.y, position.z);
+	glVertex3f(-position.x, position.y, position.z);
 	glEnd();
 }
