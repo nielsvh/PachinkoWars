@@ -23,5 +23,7 @@ public:
 	vector<Pin*> pins;
 	vector<Ball*> balls;
 	QuadTree tree;
+	Vector3* fG;
+	vector<GameObject*> objects;
 };
 

@@ -3,6 +3,7 @@
 
 QuadTree::QuadTree(void)
 {
+	rootStatic = rootNode = NULL;
 }
 
 
@@ -10,26 +11,23 @@ QuadTree::~QuadTree(void)
 {
 }
 
-void QuadTree::BuildTree( vector<GameObject*> objects, Point3* location, float width, float height )
+void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, float width, float height )
 {
 	
-	rootNode = new MyNode();
-	rootNode->myObjects = new vector<GameObject*>();
+	rootStatic = new MyNode();
+	rootStatic->myObjects = new vector<GameObject*>();
 	myObjects = vector<GameObject*>();
 	for (int i = 0; i<objects.size();i++)
 	{
-		//vector<GameObject>* myObjects;
 		myObjects.push_back(objects[i]);
-		rootNode->myObjects->push_back(objects[i]);
+		rootStatic->myObjects->push_back(objects[i]);
 	}
-	//QuadTree* tree;
-	rootNode->tree = this;
-	//float *width, *height;
-	rootNode->width = width;
-	rootNode->height = height;
-	//Point3 *position;
-	rootNode->position = location;
-	SplitNode(rootNode, 0);
+
+	rootStatic->tree = this;
+	rootStatic->width = width;
+	rootStatic->height = height;
+	rootStatic->position = location;
+	SplitNode(rootStatic, 0);
 }
 
 void QuadTree::SplitNode( MyNode* n, int steps )
@@ -100,6 +98,16 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 
 	if (n->br->myObjects->size()>TOLERANCE)
 		SplitNode(n->br, steps+1);
+}
+
+void QuadTree::AddMovingObjects( vector<GameObject*> objects )
+{
+	rootNode = new MyNode(*rootStatic);
+	for (int i = 0; i<objects.size();i++)
+	{
+		// for each object to be added, find the node that it belongs in
+	}
+	// after all the objects have been added, split the nodes based off of their depth and number of object inside.
 }
 
 void QuadTree::Draw()

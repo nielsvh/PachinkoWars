@@ -15,12 +15,12 @@ Table::~Table(void)
 
 void Table::init()
 {
-	int width, height;
-	int nComponents;
-	void* pTextureImage, *pTextureImage1;
+	fG = new Vector3(0,-.01,0);
+
 	pins = vector<Pin*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(0,8,0)));
+	balls.push_back(new Ball(Point3(0,8,0), fG));
+
 
 	//glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -29,7 +29,10 @@ void Table::init()
 	//glEnable(GL_LIGHT0);
 
 
-	pTextureImage = read_texture("back.rgb", &width, &height, &nComponents);
+	int width, height;
+	int nComponents;
+	void* pTextureImage, *pTextureImage1;
+	pTextureImage = read_texture("pachinko.rgb", &width, &height, &nComponents);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	gluBuild2DMipmaps(GL_TEXTURE_2D,     // texture to specify
 		GL_RGBA,           // internal texture storage format
@@ -52,8 +55,8 @@ void Table::init()
 
 	tree = QuadTree();
 
-	vector<GameObject*> tmp = vector<GameObject*>(pins.begin(), pins.end());
-	tree.BuildTree(tmp, new Point3(-8, 0, 0), 16.0, 16.0);
+	objects = vector<GameObject*>(pins.begin(), pins.end());
+	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
 }
 
 void Table::FileIn()
@@ -158,6 +161,13 @@ void Table::FileIn()
 
 void Table::Update()
 {
+	for (int i = 0; i<balls.size();i++)
+	{
+		balls[i]->Update();
+	}
+	vector<GameObject*> tmp = vector<GameObject*>(balls.begin(), balls.end());
+
+	tree.AddMovingObjects(tmp);
 }
 
 void Table::Draw()
