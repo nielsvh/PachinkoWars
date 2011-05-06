@@ -11,6 +11,7 @@ Ball::Ball( Point3 pos, Vector3* fG )
 	position = pos;
 	radius = .2;
 	gravity = fG;
+	objectType = type::BALL;
 }
 
 

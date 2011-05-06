@@ -12,7 +12,6 @@ public:
 	void Draw();
 private:
 	Vector3* gravity;
-	float radius;
 	Vector3 velocity, acceleration;
 };
 

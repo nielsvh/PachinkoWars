@@ -20,6 +20,7 @@ public:
 	void FileIn();
 	void Draw();
 	void Update();
+	void CreateSides(Point3 p1, Point3 p2, Point3 p3, Point3 p4, int* step);
 	vector<Pin*> pins;
 	vector<Ball*> balls;
 	QuadTree tree;

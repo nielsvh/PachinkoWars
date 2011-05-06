@@ -32,8 +32,20 @@ void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, f
 
 void QuadTree::SplitNode( MyNode* n, int steps )
 {
-	if (steps>4)
+	if (steps>4 || n->myObjects->size() < TOLERANCE)
 	{
+		for (int i = 0;i<n->myObjects->size();i++)
+		{
+			if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
+			{
+				n->hasBall = true;
+				break;
+			}
+			else
+			{
+				n->hasBall = false;
+			}
+		}
 		return;
 	}
 	n->tl = new MyNode();
@@ -106,8 +118,43 @@ void QuadTree::AddMovingObjects( vector<GameObject*> objects )
 	for (int i = 0; i<objects.size();i++)
 	{
 		// for each object to be added, find the node that it belongs in
+		InsertObject(objects[i], rootNode,0);
 	}
-	// after all the objects have been added, split the nodes based off of their depth and number of object inside.
+}
+
+void QuadTree::InsertObject( GameObject* obj, MyNode* n, int steps )
+{
+	if (n->tl == NULL)
+	{
+		// after all the objects have been added, split the nodes based off of their depth and number of object inside.
+		//n->hasBall = true;
+		n->myObjects->push_back(obj);
+		SplitNode(n,steps);
+		return;
+	}
+
+	if (obj->position.x > n->br->position->x)
+	{
+		if (obj->position.y > n->tr->position->y)
+		{
+			InsertObject(obj,n->tr, steps+1);
+		}
+		else
+		{
+			InsertObject(obj,n->br, steps+1);
+		}
+	}
+	else
+	{
+		if (obj->position.y<obj->position.y > n->tl->position->y)
+		{
+			InsertObject(obj,n->tl, steps+1);
+		}
+		else
+		{
+			InsertObject(obj, n->bl, steps+1);
+		}
+	}
 }
 
 void QuadTree::Draw()
@@ -116,8 +163,64 @@ void QuadTree::Draw()
 		Draw(rootNode);
 }
 
+void QuadTree::CheckCollisions()
+{
+	CheckCollisionsNode(rootNode);
+}
+
+void QuadTree::CheckCollisionsNode(MyNode* n)
+{
+	if (n->bl != NULL)
+	{
+		CheckCollisionsNode(n->bl);
+		CheckCollisionsNode(n->tl);
+		CheckCollisionsNode(n->br);
+		CheckCollisionsNode(n->tr);
+		return;
+	}
+	else if (!n->hasBall)
+	{
+		return;
+	}
+	else if(n->myObjects->size()<2)
+	{
+		return;
+	}
+
+	for (int i = 0;i<n->myObjects->size();i++)
+	{
+		if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
+		{
+			//continue;
+		}
+		for (int j = i+1;j<n->myObjects->size();j++)
+		{
+			Vector3 diff = (*n->myObjects)[i]->position-(*n->myObjects)[j]->position;
+			float minDist = (*n->myObjects)[i]->radius+(*n->myObjects)[j]->radius;
+			float diff2 = diff.getLength();
+			if (diff.getLength()<minDist)
+			{
+				//printf("COLLISION!\n");
+				(*n->myObjects)[i]->isColliding = true;
+			}
+			else
+			{
+				(*n->myObjects)[i]->isColliding = false;
+			}
+		}
+	}
+}
+
 void QuadTree::Draw( MyNode* n )
 {
+	if (n->hasBall == true)
+	{
+		glColor3f(1,0,0);
+	}
+	else
+	{
+		glColor3f(1,1,1);
+	}
 	glBegin(GL_LINE_STRIP);
 	glVertex3f(n->position->x, n->position->y,n->position->z);
 	glVertex3f(n->position->x+n->width, n->position->y, n->position->z);

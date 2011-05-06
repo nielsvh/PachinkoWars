@@ -7,7 +7,9 @@ Pin::Pin(void)
 
 Pin::Pin( Point3 myPosition )
 {
+	objectType = type::PIN;
 	position = myPosition;
+	radius = 10;
 	Point3 apoints[22] = {
 		Point3(0,0,0),Point3(0,1,0),
 		Point3(1/16.f, 0,0),Point3(1/16.f, 1.-3/16.f,0),Point3(1/8.f, 1.-1/8.f, 0),Point3(5/16.f, 1.0-1/8., 0),Point3(5/16.f, 1, 0),
@@ -58,7 +60,16 @@ void Pin::Draw()
 	glVertex3f(points[17].x, points[17].y, points[17].z);
 	glEnd();*/
 
+	if (isColliding)
+	{
+		glColor3f(1,0,0);
+	}
+	else
+	{
+		glColor3f(1,1,1);
+	}
 	glBegin(GL_POINTS);
-	glVertex3f(-position.x, position.y, position.z);
+	glVertex3f(position.x, position.y, position.z);
 	glEnd();
+	glColor3f(1,1,1);
 }

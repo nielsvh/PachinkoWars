@@ -3,6 +3,7 @@
 
 GameObject::GameObject(void)
 {
+	isColliding = false;
 }
 
 
