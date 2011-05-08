@@ -1,7 +1,6 @@
 #include "Table.h"
 
 float xs[1000], ys[1000];
-Point3 tableWallPoints[1000];
 int xp = 0, yp = 0;
 
 Table::Table(void)
@@ -22,7 +21,7 @@ void Table::init()
 	// set up the pin and ball vectors
 	pins = vector<Pin*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(0,8,0), fG));
+	balls.push_back(new Ball(Point3(-6,16,0), fG));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -63,6 +62,7 @@ void Table::init()
 	// insert the objects from the board into the quadtree
 	objects = vector<GameObject*>(pins.begin(), pins.end());
 	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
+	tree.AddTableWalls(tableWallPoints);
 }
 
 void Table::FileIn()
@@ -71,7 +71,7 @@ void Table::FileIn()
 	fstream file;
 	int *step = new int(0);
 
-	file.open(fileName);
+	file.open(FILE_NAME);
 	//Tests to see if file was found
 	if (!file)
 	{
@@ -197,50 +197,27 @@ void Table::FileIn()
 			switch (wallPoint)
 			{
 			case 0:
-				p1 = Point3(x1,y1,0);
+				p1 = Point3(x1/10.0,y1/10.0,0);
 				wallPoint++;
 				break;
 			case 1:
-				p2 = Point3(x1,y1,0);
+				p2 = Point3(x1/10.0,y1/10.0,0);
 				wallPoint++;
 				break;
 			case 2:
-				p3 = Point3(x1,y1,0);
+				p3 = Point3(x1/10.0,y1/10.0,0);
 				wallPoint++;
 				break;
 			case 3:
-				p4 = Point3(x1,y1,0);
-				CreateSides(p1, p2, p3, p4, step);
+				p4 = Point3(x1/10.0,y1/10.0,0);
 				wallPoint = 0;
+				createWall(p1,p2,p3,p4);
 				break;
-
 			}
 
 		}
 	}
 	file.close();
-}
-
-void Table::CreateSides( Point3 p1, Point3 p2, Point3 p3, Point3 p4, int* step )
-{
-	double a[5];
-	double b[5];
-	a[0] = (-p1.x + 3 * p2.x - 3 * p3.x + p4.x) / 6.0f;
-	a[1] = (3 * p1.x - 6 * p2.x + 3 * p3.x) / 6.0f;
-	a[2] = (-3 * p1.x + 3 * p3.x) / 6.0f;
-	a[3] = (p1.x + 4 * p2.x + p3.x) / 6.0f;
-	b[0] = (-p1.y + 3 * p2.y - 3 * p3.y + p4.y) / 6.0f;
-	b[1] = (3 * p1.y - 6 * p2.y + 3 * p3.y) / 6.0f;
-	b[2] = (-3 * p1.y + 3 * p3.y) / 6.0f;
-	b[3] = (p1.y + 4 * p2.y + p3.y) / 6.0f;
-
-	tableWallPoints[*step] = Point3(a[3], b[3], 0);
-
-	for(int i = 1; i <= 3; i++){
-		double j = (double)i / (double)3;
-		tableWallPoints[*step] = Point3(pow(j,3.0)*a[0] + pow(j,2.0)*a[1] + j*a[2] + a[3],pow(j,3.0)*b[0] + pow(j,2.0)*b[1] + j*b[2] + b[3],0);
-		*step += 1;
-	}
 }
 
 void Table::Update()
@@ -255,6 +232,7 @@ void Table::Update()
 	tree.AddMovingObjects(tmp);
 	// check for collision
 	tree.CheckCollisions();
+	//tree.BruteCollisions(pins, balls);
 }
 
 void Table::Draw()
@@ -286,10 +264,32 @@ void Table::Draw()
 	}
 
 	glBegin(GL_LINE_STRIP);
-	for (int i = 0; i<10;i++)
+	for (int i = 0; i<tableWallPoints.size();i++)
 	{
-		glVertex3f(tableWallPoints[i].x/10., tableWallPoints[i].y/10., 0);
+		glVertex3f(tableWallPoints[i]->x, tableWallPoints[i]->y, 0);
 	}
 	glEnd();
 	
+}
+
+void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
+{
+	float t = 0, step = 1.0/STEPS;
+	Point3 p[STEPS];
+	tableWallPoints.push_back(new Point3(p0));
+
+	// (1-t)^3 * p0 + 3t(1-t)^2*p1 + 3t^2(1-t)p2+t^3*p3
+	for (int i = 0; i< STEPS;i++)
+	{
+		p[i] = Point3(p0*pow((1.0f-t),3.0f) + p1*3*t*pow((1.0f-t),2.0f) + p2*3*pow(t,2.0f)*(1.0-t) + p3*pow(t,3.0f));
+
+		Vector3 v = p[i]-*tableWallPoints.back();
+		float l = v.getLength();
+		if (l >= .2)
+		{
+			tableWallPoints.push_back(new Point3(p[i]));
+		}
+		t+=step;
+	}
+	tableWallPoints.push_back(new Point3(p3));
 }

@@ -13,13 +13,13 @@ QuadTree::~QuadTree(void)
 
 void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, float width, float height )
 {
-	
+
 	rootStatic = new MyNode();
 	rootStatic->myObjects = new vector<GameObject*>();
-	myObjects = vector<GameObject*>();
+	//myObjects = vector<GameObject*>();
 	for (int i = 0; i<objects.size();i++)
 	{
-		myObjects.push_back(objects[i]);
+		//myObjects.push_back(objects[i]);
 		rootStatic->myObjects->push_back(objects[i]);
 	}
 
@@ -48,6 +48,7 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 		}
 		return;
 	}
+
 	n->tl = new MyNode();
 	n->tr = new MyNode();
 	n->bl = new MyNode();
@@ -98,17 +99,13 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	// for now don't remove objects from parent nodes
 
 	n->tl->tree = n->tr->tree = n->bl->tree = n->br->tree = this;
-	
-	if (n->tl->myObjects->size()>TOLERANCE)
+
 		SplitNode(n->tl, steps+1);
 
-	if (n->tr->myObjects->size()>TOLERANCE)
 		SplitNode(n->tr, steps+1);
 
-	if (n->bl->myObjects->size()>TOLERANCE)
 		SplitNode(n->bl, steps+1);
 
-	if (n->br->myObjects->size()>TOLERANCE)
 		SplitNode(n->br, steps+1);
 }
 
@@ -146,7 +143,7 @@ void QuadTree::InsertObject( GameObject* obj, MyNode* n, int steps )
 	}
 	else
 	{
-		if (obj->position.y<obj->position.y > n->tl->position->y)
+		if (obj->position.y > n->tl->position->y)
 		{
 			InsertObject(obj,n->tl, steps+1);
 		}
@@ -161,6 +158,36 @@ void QuadTree::Draw()
 {
 	if (rootNode != NULL)
 		Draw(rootNode);
+}
+
+void QuadTree::BruteCollisions(vector<Pin*> pins, vector<Ball*> balls)
+{
+	// check collisions with objects
+	for (int i = 0;i<balls.size();i++)
+	{
+		for (int j = 0;j<pins.size();j++)
+		{
+			//			if (i == j)
+			//continue;
+			Vector3 diff = balls[i]->position-pins[j]->position;
+			float minDist = balls[i]->radius+pins[j]->radius;
+			if (diff.getLength()<minDist)
+			{
+				if (pins[j]->objectType ==  GameObject::type::BALL)
+				{
+
+				}
+				else if (pins[j]->objectType ==  GameObject::type::PIN)
+				{
+					Vector3 newV = diff;
+					newV.normalize();
+					newV = (balls[i])->Velocity().getLength() * newV;
+					(balls[i])->Velocity(newV);
+				}
+
+			}
+		}
+	}
 }
 
 void QuadTree::CheckCollisions()
@@ -187,25 +214,59 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 		return;
 	}
 
+	// check collisions with objects
 	for (int i = 0;i<n->myObjects->size();i++)
 	{
-		if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
+		if ((*n->myObjects)[i]->objectType !=  GameObject::type::BALL)
 		{
-			//continue;
+			continue;
 		}
-		for (int j = i+1;j<n->myObjects->size();j++)
+		for (int j = 0;j<n->myObjects->size();j++)
 		{
+//			if (i == j)
+				//continue;
 			Vector3 diff = (*n->myObjects)[i]->position-(*n->myObjects)[j]->position;
 			float minDist = (*n->myObjects)[i]->radius+(*n->myObjects)[j]->radius;
-			float diff2 = diff.getLength();
 			if (diff.getLength()<minDist)
 			{
-				//printf("COLLISION!\n");
-				(*n->myObjects)[i]->isColliding = true;
+				if ((*n->myObjects)[j]->objectType ==  GameObject::type::BALL)
+				{
+
+				}
+				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::PIN)
+				{
+					Vector3 newV = diff;
+					newV.normalize();
+					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * newV;
+					((Ball*)(*n->myObjects)[i])->Velocity(newV);
+				}
+
 			}
-			else
+		}
+	}
+
+	// check collisions with walls!
+	if (n->hasWall)
+	{
+		for (int i = 0;i<n->myObjects->size();i++)
+		{
+			if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
 			{
-				(*n->myObjects)[i]->isColliding = false;
+				for (int j = 0;j<n->wallPoints.size()-1;j++)
+				{
+					Vector3 v = *n->wallPoints[j] - *n->wallPoints[j+1];
+					Vector3 v2 = *n->wallPoints[j] - (*n->myObjects)[i]->position;
+
+					// get the projection!
+					Vector3 tmp = v;
+					tmp.normalize();
+					Vector3 proj = (v2*tmp)*tmp;
+					if (proj.getLength() <= v.getLength())
+					{
+						// the ball is within the boundaries of the wall!
+						//((Ball*)(*n->myObjects)[i])->Velocity(Vector3(((Ball*)(*n->myObjects)[i])->Velocity().x,((Ball*)(*n->myObjects)[i])->Velocity().y * -1,((Ball*)(*n->myObjects)[i])->Velocity().z));
+					}
+				}
 			}
 		}
 	}
@@ -234,4 +295,43 @@ void QuadTree::Draw( MyNode* n )
 		Draw(n->bl);
 		Draw(n->br);
 	}
+}
+
+void QuadTree::AddTableWalls( vector<Point3*> points )
+{
+	for (int i = 0;i<points.size();i++)
+	{
+		AddTableWalls(points[i], rootStatic);
+	}
+}
+
+void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
+{
+	// if it is null, then it is a leaf, not a node. Add to leaf!
+	if (n->tl != NULL)
+	{
+		if (p->x > n->br->position->x)
+		{
+			if (p->y> n->tl->position->y)
+			{
+				AddTableWalls(p, n->tr);
+				return;
+			}
+			AddTableWalls(p, n->br);
+			return;
+		}
+		else
+		{
+			if (p->y> n->tl->position->y)
+			{
+				AddTableWalls(p, n->tl);
+				return;
+			}
+			AddTableWalls(p, n->bl);
+			return;
+		}
+	}
+
+	n->hasWall = true;
+	n->wallPoints.push_back(p);
 }

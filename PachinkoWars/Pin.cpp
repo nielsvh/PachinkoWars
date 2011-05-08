@@ -9,7 +9,7 @@ Pin::Pin( Point3 myPosition )
 {
 	objectType = type::PIN;
 	position = myPosition;
-	radius = 10;
+	radius = .05;
 	Point3 apoints[22] = {
 		Point3(0,0,0),Point3(0,1,0),
 		Point3(1/16.f, 0,0),Point3(1/16.f, 1.-3/16.f,0),Point3(1/8.f, 1.-1/8.f, 0),Point3(5/16.f, 1.0-1/8., 0),Point3(5/16.f, 1, 0),

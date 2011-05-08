@@ -9,7 +9,8 @@
 #include "Ball.h"
 using namespace std;
 
-#define fileName "PACHINKO.txt"
+#define FILE_NAME "PACHINKO.txt"
+#define STEPS 100
 
 class Table
 {
@@ -21,10 +22,12 @@ public:
 	void Draw();
 	void Update();
 	void CreateSides(Point3 p1, Point3 p2, Point3 p3, Point3 p4, int* step);
+	void createWall( Point3 p1, Point3 p2, Point3 p3, Point3 p4 );
 	vector<Pin*> pins;
 	vector<Ball*> balls;
 	QuadTree tree;
 	Vector3* fG;
 	vector<GameObject*> objects;
+	vector<Point3*> tableWallPoints;
 };
 

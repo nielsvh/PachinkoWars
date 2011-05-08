@@ -10,6 +10,8 @@ public:
 	~Ball(void);
 	void Update();
 	void Draw();
+	Vector3 Velocity() const { return velocity; }
+	void Velocity(Vector3 val) { velocity = val; }
 private:
 	Vector3* gravity;
 	Vector3 velocity, acceleration;
