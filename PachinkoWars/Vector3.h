@@ -67,8 +67,8 @@ static Vector3& operator-(Point3& lhs, Point3& rhs)
 
 static Point3& operator+(Point3& p, Vector3& v)
 {
-	Point3 result = Point3(p.x+v.x, p.y+v.y, p.z+v.z);
-	return result;
+	Point3 *result = new  Point3(p.x+v.x, p.y+v.y, p.z+v.z);
+	return *result;
 };
 
 static Point3& operator-(Point3& p, Vector3& v)

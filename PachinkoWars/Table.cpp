@@ -16,12 +16,12 @@ Table::~Table(void)
 void Table::init()
 {
 	// set the force of gravity so that all things in the board can reference it
-	fG = new Vector3(0,-.01,0);
+	fG = new Vector3(0,-.005,0);
 
 	// set up the pin and ball vectors
 	pins = vector<Pin*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(-6,16,0), fG));
+	balls.push_back(new Ball(Point3(-1,2,0), fG));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -263,13 +263,18 @@ void Table::Draw()
 		balls[i]->Draw();
 	}
 
-	glBegin(GL_LINE_STRIP);
+	/*glBegin(GL_LINE_STRIP);
+	for (int i = 0; i<tableWallPoints.size();i++)
+	{
+		glVertex3f(tableWallPoints[i]->x, tableWallPoints[i]->y, 0);
+	}
+	glEnd();*/
+	glBegin(GL_POINTS);
 	for (int i = 0; i<tableWallPoints.size();i++)
 	{
 		glVertex3f(tableWallPoints[i]->x, tableWallPoints[i]->y, 0);
 	}
 	glEnd();
-	
 }
 
 void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )

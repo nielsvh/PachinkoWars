@@ -130,24 +130,27 @@ void QuadTree::InsertObject( GameObject* obj, MyNode* n, int steps )
 		return;
 	}
 
-	if (obj->position.x > n->br->position->x)
+	if (obj->position.x > n->br->position->x || obj->position.x + obj->radius > n->br->position->x)
 	{
-		if (obj->position.y > n->tr->position->y)
+		if (obj->position.y > n->tr->position->y|| obj->position.y + obj->radius > n->tr->position->y)
 		{
 			InsertObject(obj,n->tr, steps+1);
 		}
-		else
+
+		if (obj->position.y < n->tr->position->y|| obj->position.y - obj->radius < n->tr->position->y)
 		{
 			InsertObject(obj,n->br, steps+1);
 		}
 	}
-	else
+	
+
+	if (obj->position.x < n->br->position->x || obj->position.x - obj->radius < n->br->position->x)
 	{
-		if (obj->position.y > n->tl->position->y)
+		if (obj->position.y > n->tr->position->y|| obj->position.y + obj->radius > n->tr->position->y)
 		{
 			InsertObject(obj,n->tl, steps+1);
 		}
-		else
+		if (obj->position.y < n->tr->position->y|| obj->position.y - obj->radius < n->tr->position->y)
 		{
 			InsertObject(obj, n->bl, steps+1);
 		}
@@ -209,7 +212,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 	{
 		return;
 	}
-	else if(n->myObjects->size()<2)
+	else if(n->myObjects->size()<2)//Only contains the ball
 	{
 		return;
 	}
@@ -237,7 +240,8 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 				{
 					Vector3 newV = diff;
 					newV.normalize();
-					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * newV;
+					(*n->myObjects)[i]->position = (*n->myObjects)[j]->position + (minDist * newV); 
+					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
 					((Ball*)(*n->myObjects)[i])->Velocity(newV);
 				}
 
@@ -254,17 +258,23 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 			{
 				for (int j = 0;j<n->wallPoints.size()-1;j++)
 				{
-					Vector3 v = *n->wallPoints[j] - *n->wallPoints[j+1];
-					Vector3 v2 = *n->wallPoints[j] - (*n->myObjects)[i]->position;
+					Vector3 v = *n->wallPoints[j+1] - *n->wallPoints[j];
+					Vector3 v2 = (*n->myObjects)[i]->position - *n->wallPoints[j];
 
 					// get the projection!
 					Vector3 tmp = v;
 					tmp.normalize();
 					Vector3 proj = (v2*tmp)*tmp;
-					if (proj.getLength() <= v.getLength())
+
+					if (v*v2 >0 && proj.getLength()> v.getLength())
 					{
-						// the ball is within the boundaries of the wall!
-						//((Ball*)(*n->myObjects)[i])->Velocity(Vector3(((Ball*)(*n->myObjects)[i])->Velocity().x,((Ball*)(*n->myObjects)[i])->Velocity().y * -1,((Ball*)(*n->myObjects)[i])->Velocity().z));
+						Vector3 norm = v.cross(Vector3(0,0,1));
+						norm.normalize();
+						if ((v2 - proj).getLength() <= (*n->myObjects)[i]->radius)
+						{
+							(*n->myObjects)[i]->position = *n->wallPoints[j] + ((*n->myObjects)[i]->radius *norm);
+							((Ball*)(*n->myObjects)[i])->Velocity(-1*((Ball*)(*n->myObjects)[i])->Velocity());
+						}
 					}
 				}
 			}

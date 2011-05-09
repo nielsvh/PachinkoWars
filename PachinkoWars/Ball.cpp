@@ -9,7 +9,7 @@ Ball::Ball(void)
 Ball::Ball( Point3 pos, Vector3* fG )
 {
 	position = pos;
-	radius = .2;
+	radius = .15;
 	gravity = fG;
 	objectType = type::BALL;
 }
