@@ -261,18 +261,28 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					Vector3 v = *n->wallPoints[j+1] - *n->wallPoints[j];
 					Vector3 v2 = (*n->myObjects)[i]->position - *n->wallPoints[j];
 
+					if (v*v2<0)
+					{
+						printf("outside bounds.\n");
+					}
+
 					// get the projection!
 					Vector3 tmp = v;
 					tmp.normalize();
 					Vector3 proj = (v2*tmp)*tmp;
 
-					if (v*v2 >0 && proj.getLength()> v.getLength())
+					if (v*v2 >0 && proj.getLength()< v.getLength())
 					{
-						Vector3 norm = v.cross(Vector3(0,0,1));
+						printf("The length of |v|: %f\n", tmp.getLength());
+						printf("The dot product of proj*v: %f\n",proj*v);
+						Vector3 norm = v.cross(Vector3(0,0,-1));
 						norm.normalize();
+						printf("Is the normal perpendicular: %f %f\n",v*norm, proj*norm);
 						if ((v2 - proj).getLength() <= (*n->myObjects)[i]->radius)
 						{
-							(*n->myObjects)[i]->position = *n->wallPoints[j] + ((*n->myObjects)[i]->radius *norm);
+							printf("Ball's old position x:%f y:%f z:%f\n",(*n->myObjects)[i]->position.x ,(*n->myObjects)[i]->position.y ,(*n->myObjects)[i]->position.z );
+							printf("Ball's calculated new position x:%f y:%f z:%f\n",(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).x,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).y,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).z);
+							(*n->myObjects)[i]->position = *n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm);
 							((Ball*)(*n->myObjects)[i])->Velocity(-1*((Ball*)(*n->myObjects)[i])->Velocity());
 						}
 					}

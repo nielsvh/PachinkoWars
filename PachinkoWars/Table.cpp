@@ -21,7 +21,7 @@ void Table::init()
 	// set up the pin and ball vectors
 	pins = vector<Pin*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(-1,2,0), fG));
+	balls.push_back(new Ball(Point3(-2,14,0), fG));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
