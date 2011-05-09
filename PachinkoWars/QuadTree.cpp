@@ -100,13 +100,13 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 
 	n->tl->tree = n->tr->tree = n->bl->tree = n->br->tree = this;
 
-		SplitNode(n->tl, steps+1);
+	SplitNode(n->tl, steps+1);
 
-		SplitNode(n->tr, steps+1);
+	SplitNode(n->tr, steps+1);
 
-		SplitNode(n->bl, steps+1);
+	SplitNode(n->bl, steps+1);
 
-		SplitNode(n->br, steps+1);
+	SplitNode(n->br, steps+1);
 }
 
 void QuadTree::AddMovingObjects( vector<GameObject*> objects )
@@ -142,7 +142,7 @@ void QuadTree::InsertObject( GameObject* obj, MyNode* n, int steps )
 			InsertObject(obj,n->br, steps+1);
 		}
 	}
-	
+
 
 	if (obj->position.x < n->br->position->x || obj->position.x - obj->radius < n->br->position->x)
 	{
@@ -226,8 +226,8 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 		}
 		for (int j = 0;j<n->myObjects->size();j++)
 		{
-//			if (i == j)
-				//continue;
+			//			if (i == j)
+			//continue;
 			Vector3 diff = (*n->myObjects)[i]->position-(*n->myObjects)[j]->position;
 			float minDist = (*n->myObjects)[i]->radius+(*n->myObjects)[j]->radius;
 			if (diff.getLength()<minDist)
@@ -242,9 +242,64 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					newV.normalize();
 					(*n->myObjects)[i]->position = (*n->myObjects)[j]->position + (minDist * newV); 
 					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
+					// to prevent the balls from getting stuck on the top of pins, we add just a little to the x in velocity.
+					newV = newV + Vector3(.001,0,0.1);
 					((Ball*)(*n->myObjects)[i])->Velocity(newV);
 				}
+				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
+				{
+					Ball* b = (Ball*)(*n->myObjects)[i];
+					Spinner* s = (Spinner*)(*n->myObjects)[j];
 
+					// need to check p1, then p2 and p4 or p3, then p2 and p4
+					Plane p1, p2, p3, p4;
+					p1 = Plane(s->boundingCube[0], s->boundingCube[3],s->boundingCube[4]);
+					if ((s->boundingCube[0]-b->position)*p1.GetNormal()<0)
+					{
+						p2 = Plane(s->boundingCube[1], s->boundingCube[0],s->boundingCube[5]);
+						if ((s->boundingCube[1]-b->position)*p2.GetNormal()<0)
+						{
+							p3 = Plane(s->boundingCube[2], s->boundingCube[1],s->boundingCube[6]);
+							if ((s->boundingCube[2]-b->position)*p3.GetNormal()<0)
+							{
+								p4 = Plane(s->boundingCube[3], s->boundingCube[2],s->boundingCube[7]);
+								if ((s->boundingCube[3]-b->position)*p4.GetNormal()<0)
+								{
+								}
+							}
+						}
+					}
+
+					
+					
+					// find the current position of the bar
+					Quaternion tmp1 = Quaternion(s->rotation);
+					// find the force applied to the bar
+					// ft = dp/dt = m*dv/dt
+					// find perpendicular momentum
+					Vector3 totalForce = b->Mass() * b->Velocity();
+					
+					//totalForce = gravity;
+					Vector3 tmp = Vector3(tmp1.x, tmp1.y, tmp1.z);
+
+					// t = r X F
+					Vector3 torque = tmp.cross(totalForce);
+
+					Vector3 dL = .05 * torque;
+
+					// find the rotation matrix and the inverse of the rotation matrix
+					Matrix33 myRotation = Matrix33(s->rotation);
+					Matrix33 myRotationT = myRotation.Transpose();
+
+					s->myL = s->myL + dL;
+
+					//w(i+1) = q(i+1) * I(-1) * qT(i+1) * L(i+1)
+					s->angularVel = myRotation * *s->tensor->inverse() * myRotationT * s->myL;
+
+					//q(n+1) = q(n) + h(.5 * w(n)*q(n))
+					s->rotation = s->rotation + .05*(.5 * Quaternion(s->angularVel) * s->rotation);
+					s->rotation.normalize();
+				}
 			}
 		}
 	}
@@ -273,15 +328,15 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 
 					if (v*v2 >0 && proj.getLength()< v.getLength())
 					{
-						printf("The length of |v|: %f\n", tmp.getLength());
-						printf("The dot product of proj*v: %f\n",proj*v);
+						//printf("The length of |v|: %f\n", tmp.getLength());
+						//printf("The dot product of proj*v: %f\n",proj*v);
 						Vector3 norm = v.cross(Vector3(0,0,-1));
 						norm.normalize();
-						printf("Is the normal perpendicular: %f %f\n",v*norm, proj*norm);
+						//printf("Is the normal perpendicular: %f %f\n",v*norm, proj*norm);
 						if ((v2 - proj).getLength() <= (*n->myObjects)[i]->radius)
 						{
-							printf("Ball's old position x:%f y:%f z:%f\n",(*n->myObjects)[i]->position.x ,(*n->myObjects)[i]->position.y ,(*n->myObjects)[i]->position.z );
-							printf("Ball's calculated new position x:%f y:%f z:%f\n",(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).x,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).y,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).z);
+							//printf("Ball's old position x:%f y:%f z:%f\n",(*n->myObjects)[i]->position.x ,(*n->myObjects)[i]->position.y ,(*n->myObjects)[i]->position.z );
+							//printf("Ball's calculated new position x:%f y:%f z:%f\n",(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).x,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).y,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).z);
 							(*n->myObjects)[i]->position = *n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm);
 							((Ball*)(*n->myObjects)[i])->Velocity(-1*((Ball*)(*n->myObjects)[i])->Velocity());
 						}

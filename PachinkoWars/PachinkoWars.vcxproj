@@ -69,6 +69,7 @@
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Pin.cpp" />
     <ClCompile Include="PinLineCurve.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Point3.cpp" />
     <ClCompile Include="program.cpp" />
     <ClCompile Include="QuadTree.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Pin.h" />
     <ClInclude Include="PinLineCurve.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Point3.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />

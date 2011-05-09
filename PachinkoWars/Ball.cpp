@@ -6,9 +6,10 @@ Ball::Ball(void)
 	acceleration = Vector3();
 }
 
-Ball::Ball( Point3 pos, Vector3* fG )
+Ball::Ball( Point3 pos, Vector3* fG,float m)
 {
 	position = pos;
+	mass = m;
 	radius = .15;
 	gravity = fG;
 	objectType = type::BALL;

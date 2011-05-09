@@ -7,6 +7,7 @@
 #include "PinLineCurve.h"
 #include "QuadTree.h"
 #include "Ball.h"
+#include "Spinner.h"
 using namespace std;
 
 #define FILE_NAME "PACHINKO.txt"
@@ -24,6 +25,7 @@ public:
 	void CreateSides(Point3 p1, Point3 p2, Point3 p3, Point3 p4, int* step);
 	void createWall( Point3 p1, Point3 p2, Point3 p3, Point3 p4 );
 	vector<Pin*> pins;
+	vector<Spinner*> spinners;
 	vector<Ball*> balls;
 	QuadTree tree;
 	Vector3* fG;

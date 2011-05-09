@@ -76,3 +76,9 @@ static Point3& operator-(Point3& p, Vector3& v)
 	Point3* result = new Point3(p.x-v.x, p.y-v.y, p.z-v.z);
 	return *result;
 };
+
+static Point3& operator*(float f, Point3& p)
+{
+	Point3* rtn = new Point3(p.x*f, p.y*f,p.z*f);
+	return *rtn;
+}

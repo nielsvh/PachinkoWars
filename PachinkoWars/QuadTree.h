@@ -5,6 +5,8 @@
 
 #include "Pin.h"
 #include "Ball.h"
+#include "Spinner.h"
+#include "Plane.h"
 
 using namespace std;
 

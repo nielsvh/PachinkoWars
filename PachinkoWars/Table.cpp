@@ -20,8 +20,9 @@ void Table::init()
 
 	// set up the pin and ball vectors
 	pins = vector<Pin*>();
+	spinners = vector<Spinner*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(-2,14,0), fG));
+	balls.push_back(new Ball(Point3(-2,14,0), fG, 1));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -61,6 +62,7 @@ void Table::init()
 
 	// insert the objects from the board into the quadtree
 	objects = vector<GameObject*>(pins.begin(), pins.end());
+	objects.insert(objects.end(), spinners.begin(), spinners.end());
 	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
 	tree.AddTableWalls(tableWallPoints);
 }
@@ -181,6 +183,17 @@ void Table::FileIn()
 		}
 		else if (line[0] == 's')
 		{
+			// step through line string and get the point info
+			string tmp = line.substr(1,line.length()-1);
+			char * pch = strtok ((char*)tmp.c_str()," ");
+
+			x1 = atof(pch);
+			pch = strtok (NULL, " ");
+
+			y1 = atof(pch);
+			pch = strtok (NULL, " ");
+
+			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), .5));
 		}
 		else if (line[0] == 'w')
 		{
@@ -226,6 +239,11 @@ void Table::Update()
 	{
 		balls[i]->Update();
 	}
+
+	for (int i = 0;i<spinners.size();i++)
+	{
+		spinners[i]->Update();
+	}
 	
 	// the quad tree needs to be rebuilt every frame. Add the moving parts to the tree and let it build
 	vector<GameObject*> tmp = vector<GameObject*>(balls.begin(), balls.end());
@@ -255,6 +273,11 @@ void Table::Draw()
 	for (int i = 0;i<pins.size();i++)
 	{
 		pins[i]->Draw();
+	}
+
+	for (int i = 0;i<spinners.size();i++)
+	{
+		spinners[i]->Draw();
 	}
 
 	// draw the balls
