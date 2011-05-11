@@ -22,7 +22,7 @@ void Table::init()
 	pins = vector<Pin*>();
 	spinners = vector<Spinner*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(2,2.5,0), fG, 1));
+	balls.push_back(new Ball(Point3(-2,2.5,0), fG, 1));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -286,7 +286,14 @@ void Table::Draw()
 		balls[i]->Draw();
 	}
 
-	
+	glBegin(GL_LINE_STRIP);
+	for (int i = 0; i<tableWallPoints.size()-1;i++)
+	{
+		glVertex3f(tableWallPoints[i]->x, tableWallPoints[i]->y, 0);
+		/*Plane plane = Plane(*tableWallPoints[i],*tableWallPoints[i+1],Point3((*tableWallPoints[i]).x,(*tableWallPoints[i]).y,-1));
+		glVertex3f(tableWallPoints[i]->x + plane.normal.x, tableWallPoints[i]->y + plane.normal.y, 0);*/
+	}
+	glEnd();
 }
 
 void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
