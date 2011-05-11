@@ -22,7 +22,7 @@ void Table::init()
 	pins = vector<Pin*>();
 	spinners = vector<Spinner*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(-2,14,0), fG, 1));
+	balls.push_back(new Ball(Point3(-2,12,0), fG, 1));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.

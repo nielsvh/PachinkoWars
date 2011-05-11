@@ -243,7 +243,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					(*n->myObjects)[i]->position = (*n->myObjects)[j]->position + (minDist * newV); 
 					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
 					// to prevent the balls from getting stuck on the top of pins, we add just a little to the x in velocity.
-					newV = newV + Vector3(.001,0,0.1);
+					newV = newV + Vector3(.001,0,0);
 					((Ball*)(*n->myObjects)[i])->Velocity(newV);
 				}
 				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
@@ -252,25 +252,28 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					Spinner* s = (Spinner*)(*n->myObjects)[j];
 
 					// need to check p1, then p2 and p4 or p3, then p2 and p4
-					Plane p1, p2, p3, p4;
-					p1 = Plane(s->boundingCube[0], s->boundingCube[3],s->boundingCube[4]);
-					if ((s->boundingCube[0]-b->position)*p1.GetNormal()<0)
+					float dist = (b->position - s->boundingCube[0]).getLength();
+					int index = 0;
+					for (int i=1;i < 8;i++)
 					{
-						p2 = Plane(s->boundingCube[1], s->boundingCube[0],s->boundingCube[5]);
-						if ((s->boundingCube[1]-b->position)*p2.GetNormal()<0)
+						float newDist = (b->position - s->boundingCube[i]).getLength();
+						if(dist > newDist)
 						{
-							p3 = Plane(s->boundingCube[2], s->boundingCube[1],s->boundingCube[6]);
-							if ((s->boundingCube[2]-b->position)*p3.GetNormal()<0)
-							{
-								p4 = Plane(s->boundingCube[3], s->boundingCube[2],s->boundingCube[7]);
-								if ((s->boundingCube[3]-b->position)*p4.GetNormal()<0)
-								{
-								}
-							}
+							dist = newDist;
+							index = i;
 						}
 					}
 
-					
+					Vector3 diff = b->position - s->position;
+					float difference = diff.getLength();
+					Vector3 closest = s->boundingCube[index] - s->position;
+					diff.normalize();
+					Vector3 proj = (closest*diff)*diff;
+					float temp = proj.getLength();
+					if(difference > temp + b->radius)
+					{
+						continue;
+					}
 					
 					// find the current position of the bar
 					Quaternion tmp1 = Quaternion(s->rotation);
@@ -311,6 +314,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 		{
 			if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
 			{
+				Ball* b = (Ball*)(*n->myObjects)[i];
 				for (int j = 0;j<n->wallPoints.size()-1;j++)
 				{
 					Vector3 v = *n->wallPoints[j+1] - *n->wallPoints[j];
@@ -328,17 +332,19 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 
 					if (v*v2 >0 && proj.getLength()< v.getLength())
 					{
-						//printf("The length of |v|: %f\n", tmp.getLength());
-						//printf("The dot product of proj*v: %f\n",proj*v);
 						Vector3 norm = v.cross(Vector3(0,0,-1));
 						norm.normalize();
-						//printf("Is the normal perpendicular: %f %f\n",v*norm, proj*norm);
 						if ((v2 - proj).getLength() <= (*n->myObjects)[i]->radius)
 						{
-							//printf("Ball's old position x:%f y:%f z:%f\n",(*n->myObjects)[i]->position.x ,(*n->myObjects)[i]->position.y ,(*n->myObjects)[i]->position.z );
-							//printf("Ball's calculated new position x:%f y:%f z:%f\n",(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).x,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).y,(*n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm)).z);
 							(*n->myObjects)[i]->position = *n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm);
 							((Ball*)(*n->myObjects)[i])->Velocity(-1*((Ball*)(*n->myObjects)[i])->Velocity());
+							float theta = 0;
+							Plane plane = Plane(*n->wallPoints[j],*n->wallPoints[j+1],Point3((*n->wallPoints[j]).x,(*n->wallPoints[j]).y,1));
+							//Point3 tempp = plane.ClosestPointToPoint(b->position);
+							Vector3 flippedBV = -1 * b->Velocity();
+							//cos^-1(a.b/|a||b|)*(180/pi)
+							theta = acos(((flippedBV*plane.normal)/(flippedBV.getLength()*plane.normal.getLength())/(180.0*3.14159)));
+							Vector3 velP, velN;
 						}
 					}
 				}
