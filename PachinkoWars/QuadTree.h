@@ -27,11 +27,6 @@ private:
 			this->tree = node.tree;
 			this->myObjects = new vector<GameObject*>(*node.myObjects);
 			this->wallPoints = vector<Point3*>(node.wallPoints);
-			/*this->myObjects = new vector<GameObject*>();
-			for (int i = 0;i<node.myObjects->size();i++)
-			{
-				this->myObjects->push_back(node.myObjects->at(i));
-			}*/
 			this->position = node.position;
 			this->width = node.width;
 			this->height = node.height;

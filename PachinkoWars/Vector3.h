@@ -82,3 +82,19 @@ static Point3& operator*(float f, Point3& p)
 	Point3* rtn = new Point3(p.x*f, p.y*f,p.z*f);
 	return *rtn;
 }
+
+static Vector3* project( Vector3 a, Vector3 b )
+{
+	Vector3 tmp = b;
+	tmp.normalize();
+	Vector3 *c = new Vector3(a.getLength() * 1.0f/(a.getLength()*b.getLength()) * (a*b) * tmp);
+	return c;
+}
+
+static Vector3* rejection(Vector3 a, Vector3 b)
+{
+
+	Vector3 bhat = b;
+	bhat.normalize();
+	return new Vector3(a - (a*bhat) * bhat);
+}

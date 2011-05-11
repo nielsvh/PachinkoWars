@@ -39,6 +39,10 @@ float Vector3::getLength(void)
 Vector3* Vector3::normalize(void)
 {
 	float l = this->getLength();
+	if (l == 0)
+	{
+		return this;
+	}
 	x/=l;y/=l;z/=l;
 	return this;
 }

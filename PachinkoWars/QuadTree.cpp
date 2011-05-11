@@ -16,6 +16,7 @@ void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, f
 
 	rootStatic = new MyNode();
 	rootStatic->myObjects = new vector<GameObject*>();
+	rootStatic->wallPoints = vector<Point3*>();
 	//myObjects = vector<GameObject*>();
 	for (int i = 0; i<objects.size();i++)
 	{
@@ -212,7 +213,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 	{
 		return;
 	}
-	else if(n->myObjects->size()<2)//Only contains the ball
+	else if(n->myObjects->size()<2 && !n->hasWall)//Only contains the ball
 	{
 		return;
 	}
@@ -317,34 +318,49 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 				Ball* b = (Ball*)(*n->myObjects)[i];
 				for (int j = 0;j<n->wallPoints.size()-1;j++)
 				{
+					// wall
 					Vector3 v = *n->wallPoints[j+1] - *n->wallPoints[j];
-					Vector3 v2 = (*n->myObjects)[i]->position - *n->wallPoints[j];
-
-					if (v*v2<0)
-					{
-						printf("outside bounds.\n");
-					}
+					// difference from wall start to current position
+					Vector3 v2 = b->position - *n->wallPoints[j];
 
 					// get the projection!
 					Vector3 tmp = v;
 					tmp.normalize();
-					Vector3 proj = (v2*tmp)*tmp;
+					// get that funky projection, white boy
+					Vector3 proj = *project(v2,tmp);
 
+					// if the ball is in front of the start and behind the end, then it could collide.
 					if (v*v2 >0 && proj.getLength()< v.getLength())
 					{
-						Vector3 norm = v.cross(Vector3(0,0,-1));
-						norm.normalize();
-						if ((v2 - proj).getLength() <= (*n->myObjects)[i]->radius)
+						Plane plane = Plane(*n->wallPoints[j],*n->wallPoints[j+1],Point3((*n->wallPoints[j]).x,(*n->wallPoints[j]).y,-1));
+						float rejections = rejection(v2, tmp)->getLength();
+						if (rejections <= b->radius)
 						{
-							(*n->myObjects)[i]->position = *n->wallPoints[j] + proj + ((*n->myObjects)[i]->radius *norm);
-							((Ball*)(*n->myObjects)[i])->Velocity(-1*((Ball*)(*n->myObjects)[i])->Velocity());
-							float theta = 0;
-							Plane plane = Plane(*n->wallPoints[j],*n->wallPoints[j+1],Point3((*n->wallPoints[j]).x,(*n->wallPoints[j]).y,1));
-							//Point3 tempp = plane.ClosestPointToPoint(b->position);
-							Vector3 flippedBV = -1 * b->Velocity();
-							//cos^-1(a.b/|a||b|)*(180/pi)
-							theta = acos(((flippedBV*plane.normal)/(flippedBV.getLength()*plane.normal.getLength())/(180.0*3.14159)));
-							Vector3 velP, velN;
+							b->position = *n->wallPoints[j] + proj + (b->radius * 2.0 * plane.normal);
+							
+							float vel = b->Velocity().getLength();
+							// COSS IS WRONG, FIX THIS THING!
+							float coss = (Vector3(1,0,0) * plane.normal);
+
+							float theta;
+							if (b->position.x>0)
+							{
+								theta =  acos(coss)+ 3.14159/2.0;
+							}
+							else{
+								theta =  acos(coss) - 3.14159/2.0;
+							}
+							float c = cos(theta), s = sin(theta);
+
+							Vector3 velP = c * b->Velocity(), velN = -1 * s * b->Velocity();
+
+							float vpx = c * vel - s * velN.getLength(), vpy = s * vel + c*velN.getLength();
+							
+
+							Vector3 newv = Vector3(vpx, vpy, 0);
+							newv.normalize();
+							
+							b->Velocity(vel * newv);
 						}
 					}
 				}
@@ -358,6 +374,21 @@ void QuadTree::Draw( MyNode* n )
 	if (n->hasBall == true)
 	{
 		glColor3f(1,0,0);
+		glBegin(GL_POINTS);
+		for (int i = 0; i<n->wallPoints.size();i++)
+		{
+			glVertex3f(n->wallPoints[i]->x, n->wallPoints[i]->y, 0);
+		}
+		glEnd();
+
+		glBegin(GL_LINE_STRIP);
+		for (int i = 0; i<n->wallPoints.size()-1 && n->wallPoints.size() != 0;i++)
+		{
+			glVertex3f(n->wallPoints[i]->x, n->wallPoints[i]->y, 0);
+			Plane plane = Plane(*n->wallPoints[i],*n->wallPoints[i+1],Point3((*n->wallPoints[i]).x,(*n->wallPoints[i]).y,-1));
+			glVertex3f(n->wallPoints[i]->x + plane.normal.x, n->wallPoints[i]->y + plane.normal.y, 0);
+		}
+		glEnd();
 	}
 	else
 	{
@@ -388,29 +419,33 @@ void QuadTree::AddTableWalls( vector<Point3*> points )
 
 void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
 {
+	float toleranceD = 0.1;
 	// if it is null, then it is a leaf, not a node. Add to leaf!
 	if (n->tl != NULL)
 	{
-		if (p->x > n->br->position->x)
+		if (p->x > n->br->position->x || p->x + toleranceD > n->br->position->x)
 		{
-			if (p->y> n->tl->position->y)
+			if (p->y> n->tr->position->y || p->y + toleranceD> n->tr->position->y)
 			{
 				AddTableWalls(p, n->tr);
-				return;
 			}
-			AddTableWalls(p, n->br);
-			return;
+			if (p->y< n->tr->position->y || p->y-toleranceD< n->tr->position->y)
+			{
+				AddTableWalls(p, n->br);
+			}
 		}
-		else
+		if (p->x < n->br->position->x || p->x - toleranceD < n->br->position->x)
 		{
-			if (p->y> n->tl->position->y)
+			if (p->y> n->tl->position->y || p->y + toleranceD> n->tl->position->y)
 			{
 				AddTableWalls(p, n->tl);
-				return;
 			}
-			AddTableWalls(p, n->bl);
-			return;
+			if (p->y< n->tl->position->y || p->y-toleranceD< n->tl->position->y)
+			{
+				AddTableWalls(p, n->bl);
+			}
 		}
+		return;
 	}
 
 	n->hasWall = true;
