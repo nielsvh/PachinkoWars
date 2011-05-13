@@ -17,6 +17,10 @@ class Table
 {
 public:
 	Table(void);
+	Table(const Table& t)
+	{
+		this->fG = t.fG;
+	}
 	~Table(void);
 	void init();
 	void FileIn();
@@ -31,5 +35,40 @@ public:
 	Vector3* fG;
 	vector<GameObject*> objects;
 	vector<Point3*> tableWallPoints;
-};
+	static Table* thisTable;
+	void spawnBall();
 
+	static void keyboardS (int key, int x, int y)
+	{
+		switch(key)
+		{
+		case GLUT_KEY_DOWN:
+			thisTable->fG->y = -.005;
+			break;
+		case GLUT_KEY_UP:
+			thisTable->fG->y = .005;
+			break;
+		case GLUT_KEY_RIGHT:
+			break;
+		case GLUT_KEY_LEFT:
+			break;
+		default:
+			break;
+		}
+	}
+
+	static void keyboardN(unsigned char key, int x, int y)
+	{
+		switch (key)
+		{
+		case 27:
+		case 'Q':
+		case 'q':
+			exit(0);
+			break;
+		case ' ':
+			thisTable->spawnBall();
+			break;
+		}
+	}
+};

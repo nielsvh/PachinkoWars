@@ -2,12 +2,12 @@
 
 float xs[1000], ys[1000];
 int xp = 0, yp = 0;
+Table* Table::thisTable;
 
 Table::Table(void)
 {
 	init();
 }
-
 
 Table::~Table(void)
 {
@@ -22,7 +22,7 @@ void Table::init()
 	pins = vector<Pin*>();
 	spinners = vector<Spinner*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(-2,2.5,0), fG, 1));
+	balls.push_back(new Ball(Point3(0,2.5,0), fG, 1));
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -316,4 +316,10 @@ void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
 		t+=step;
 	}
 	tableWallPoints.push_back(new Point3(p3));
+}
+
+void Table::spawnBall()
+{
+	Ball *newBall = new Ball(Point3(-2,2.5,0),fG, .5);
+	balls.push_back(newBall);
 }

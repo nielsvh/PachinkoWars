@@ -71,6 +71,16 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	n->tr->myObjects = new vector<GameObject*>();
 	n->bl->myObjects = new vector<GameObject*>();
 	n->br->myObjects = new vector<GameObject*>();
+
+	n->tl->wallPoints = n->wallPoints;
+	n->tr->wallPoints = n->wallPoints;
+	n->bl->wallPoints = n->wallPoints;
+	n->br->wallPoints = n->wallPoints;
+
+	n->tl->hasWall = n->hasWall;
+	n->tr->hasWall = n->hasWall;
+	n->bl->hasWall = n->hasWall;
+	n->br->hasWall = n->hasWall;
 	for (int i = 0;i<n->myObjects->size();i++)
 	{
 		GameObject* obj = (*n->myObjects)[i];
@@ -275,14 +285,14 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					{
 						continue;
 					}
-					
+
 					// find the current position of the bar
 					Quaternion tmp1 = Quaternion(s->rotation);
 					// find the force applied to the bar
 					// ft = dp/dt = m*dv/dt
 					// find perpendicular momentum
 					Vector3 totalForce = b->Mass() * b->Velocity();
-					
+
 					//totalForce = gravity;
 					Vector3 tmp = Vector3(tmp1.x, tmp1.y, tmp1.z);
 
@@ -318,51 +328,127 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 				Ball* b = (Ball*)(*n->myObjects)[i];
 				for (int j = 0;j<n->wallPoints.size()-1;j++)
 				{
-					// wall
-					Vector3 v = *n->wallPoints[j+1] - *n->wallPoints[j];
-					// difference from wall start to current position
-					Vector3 v2 = b->position - *n->wallPoints[j];
+					Vector3 wall = *n->wallPoints[j+1] - *n->wallPoints[j];
+					/*
+					// get position of ball, relative to line
+					var x1:Number = ball.x - line.x;
+					var y1:Number = ball.y - line.y;
+					*/
+					Vector3 ballFromWall = b->position - *n->wallPoints[j];
 
-					// get the projection!
-					Vector3 tmp = v;
-					tmp.normalize();
-					// get that funky projection, white boy
-					Vector3 proj = *project(v2,tmp);
-
-					// if the ball is in front of the start and behind the end, then it could collide.
-					if (v*v2 >0 && proj.getLength()< v.getLength())
+					// check to see if the ball will collide with line
+					Vector3 *rej = rejection(ballFromWall,wall);
+					if (rej->getLength() <= b->radius)
 					{
-						Plane plane = Plane(*n->wallPoints[j],*n->wallPoints[j+1],Point3((*n->wallPoints[j]).x,(*n->wallPoints[j]).y,-1));
-						float rejections = rejection(v2, tmp)->getLength();
-						if (rejections <= b->radius)
+						// check to see if the ball is above or below the line and check to see if it is heading towards or away from line
+						Plane p = Plane(*n->wallPoints[j], *n->wallPoints[j+1], Point3(0,0,1));
+						float behind = p.normal * ballFromWall;
+						if ((behind > 0 && p.normal * b->Velocity() < 0) || (behind < 0 && p.normal * b->Velocity() > 0))
 						{
-							b->position = *n->wallPoints[j] + proj + (b->radius * 2.0 * plane.normal);
-							
-							float vel = b->Velocity().getLength();
-							// COSS IS WRONG, FIX THIS THING!
-							float coss = (Vector3(1,0,0) * plane.normal);
 
-							float theta;
-							if (b->position.x>0)
+
+
+							/*
+							// get angle, sine and cosine
+							var angle:Number = line.rotation * Math.PI / 180;
+							var cos:Number = Math.cos(angle);
+							var sin:Number = Math.sin(angle);
+							*/
+							float theta, c, s;
+							theta = acos((wall * Vector3(1,0,0))/wall.getLength());
+							if (b->position.x<0)
 							{
-								theta =  acos(coss)+ 3.14159/2.0;
+								theta *= -1;
 							}
-							else{
-								theta =  acos(coss) - 3.14159/2.0;
-							}
-							float c = cos(theta), s = sin(theta);
+							c = cos(theta), s = sin(theta);
 
-							Vector3 velP = c * b->Velocity(), velN = -1 * s * b->Velocity();
 
-							float vpx = c * vel - s * velN.getLength(), vpy = s * vel + c*velN.getLength();
-							
+							/*
+							// rotate coordinates
+							var y2:Number = cos * y1 - sin * x1;
 
-							Vector3 newv = Vector3(vpx, vpy, 0);
-							newv.normalize();
-							
-							b->Velocity(vel * newv);
+							// rotate velocity
+							var vy1:Number = cos * ball.vy - sin * ball.vx;
+
+							// rotate coordinates
+							var x2:Number = cos * x1 + sin * y1;
+
+							// rotate velocity
+							var vx1:Number = cos * ball.vx + sin * ball.vy;
+
+							y2 = -ball.height / 2;
+							vy1 *= bounce;
+
+							// rotate everything back;
+							x1 = cos * x2 - sin * y2;
+							y1 = cos * y2 + sin * x2;
+							ball.vx = cos * vx1 - sin * vy1;
+							ball.vy = cos * vy1 + sin * vx1;
+							ball.x = line.x + x1;
+							ball.y = line.y + y1;
+							*/
+							Vector3 position2;
+							Vector3 velocityRot;
+
+							position2 = Vector3(c * ballFromWall.x + s * ballFromWall.y,
+								c * ballFromWall.y - s * ballFromWall.x,
+								0);
+							velocityRot = Vector3( c * b->Velocity().x + s * b->Velocity().y,
+								c * b->Velocity().y - s * b->Velocity().x,
+								0);
+
+							// set the ball outside the wall
+							position2.y = b->radius;
+							velocityRot.y *= -1;
+
+							ballFromWall = Vector3(c * position2.x - s * position2.y,c * position2.y + s * position2.x,0);
+							b->Velocity(Vector3(c * velocityRot.x - s * velocityRot.y,c * velocityRot.y + s * velocityRot.x,0));
+							b->position = *n->wallPoints[j] + ballFromWall;
 						}
+
+
 					}
+
+					//// get the projection!
+					//Vector3 tmp = v;
+					//tmp.normalize();
+					//// get that funky projection, white boy
+					//Vector3 proj = *project(v2,tmp);
+
+					//// if the ball is in front of the start and behind the end, then it could collide.
+					//if (v*v2 >0 && proj.getLength()< v.getLength())
+					//{
+					//	Plane plane = Plane(*n->wallPoints[j],*n->wallPoints[j+1],Point3((*n->wallPoints[j]).x,(*n->wallPoints[j]).y,-1));
+					//	float rejections = rejection(v2, tmp)->getLength();
+					//	if (rejections <= b->radius)
+					//	{
+					//		b->position = *n->wallPoints[j] + proj + (b->radius * 1.1f * plane.normal);
+					//		
+					//		float vel = b->Velocity().getLength();
+					//		// COSS IS WRONG, FIX THIS THING!
+					//		//float coss = (Vector3(1,0,0) * plane.normal);
+					//		float coss = v * v2 * 1.0f/(v.getLength()*v2.getLength());
+
+					//		float theta = acos(coss);
+					//		/*if (b->position.x>0)
+					//		{
+					//			theta =  acos(coss) + 3.14159/2.0;
+					//		}
+					//		else{
+					//			theta =  acos(coss) - 3.14159/2.0;
+					//		}*/
+					//		float c = cos(theta), s = sin(theta);
+
+					//		Vector3 velP = c * b->Velocity(), velN = -1 * s * b->Velocity();
+
+					//		float vpx = c * vel - s * velN.getLength(), vpy = s * vel + c*velN.getLength();
+					//		
+					//		Vector3 newv = Vector3(vpx, vpy, 0);
+					//		newv.normalize();
+					//		
+					//		b->Velocity(vel * newv);
+					//	}
+					//}
 				}
 			}
 		}
@@ -419,7 +505,7 @@ void QuadTree::AddTableWalls( vector<Point3*> points )
 
 void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
 {
-	float toleranceD = 0.1;
+	float toleranceD = .15;
 	// if it is null, then it is a leaf, not a node. Add to leaf!
 	if (n->tl != NULL)
 	{

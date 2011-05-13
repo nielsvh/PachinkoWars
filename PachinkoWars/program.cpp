@@ -10,7 +10,7 @@ using namespace std;
 
 #define FPS 1000/30
 
-Table table;
+Table *table;
 
 // Lighting values
 GLfloat  whiteLight[] = { 1.f, 1.f, 1.f, 1.0f };
@@ -29,7 +29,7 @@ void display(void)
 	//glLightfv(GL_LIGHT0,GL_POSITION,lightPos);
 	glColor3f(1.0, 1.0, 1.0);
 	glPointSize(3);
-	table.Draw();
+	table->Draw();
 	//glLightfv(GL_LIGHT0,GL_POSITION,lightPos);
 	//glutWireSphere(1,100,100);
 	glPopMatrix();
@@ -59,7 +59,7 @@ void reshape (int w, int h)
 
 void animation(void)
 {
-	table.Update();
+	table->Update();
 	glutPostRedisplay();
 }
 
@@ -105,43 +105,10 @@ void playFile (const char *wavName)
 
 void init(void) 
 {
-	table = Table();
-
+	table = new Table();
+	table->thisTable = table;
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_FLAT);
-}
-
-
-void keyboardS (int key, int x, int y)
-{
-	switch(key)
-	{
-	case GLUT_KEY_DOWN:
-		break;
-	case GLUT_KEY_UP:
-		break;
-	case GLUT_KEY_RIGHT:
-		break;
-	case GLUT_KEY_LEFT:
-		break;
-	default:
-		break;
-	}
-}
-
-void keyboardN(unsigned char key, int x, int y)
-{
-	switch (key)
-	{
-	case 27:
-	case 'Q':
-	case 'q':
-		exit(0);
-		break;
-	case 'r':
-	case 'R':
-		init();
-	}
 }
 
 int main(int argc, char** argv)
@@ -156,8 +123,8 @@ int main(int argc, char** argv)
 	GameTimer(FPS);
 	glutDisplayFunc(display); 
 	glutReshapeFunc(reshape);
-	glutSpecialFunc(keyboardS);
-	glutKeyboardFunc(keyboardN);
+	glutSpecialFunc(Table::keyboardS);
+	glutKeyboardFunc(Table::keyboardN);
 
 	glutMainLoop();
 	
