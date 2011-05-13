@@ -251,7 +251,8 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 				{
 					Vector3 newV = diff;
 					newV.normalize();
-					(*n->myObjects)[i]->position = (*n->myObjects)[j]->position + (minDist * newV); 
+					Vector3 tmpV = minDist * newV;
+					(*n->myObjects)[i]->Position((*n->myObjects)[j]->position + tmpV);
 					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
 					// to prevent the balls from getting stuck on the top of pins, we add just a little to the x in velocity.
 					newV = newV + Vector3(.001,0,0);
@@ -263,11 +264,11 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					Spinner* s = (Spinner*)(*n->myObjects)[j];
 
 					// need to check p1, then p2 and p4 or p3, then p2 and p4
-					float dist = (b->position - s->boundingCube[0]).getLength();
+					float dist = ((Vector3&)(b->position - s->boundingCube[0])).getLength();
 					int index = 0;
 					for (int i=1;i < 8;i++)
 					{
-						float newDist = (b->position - s->boundingCube[i]).getLength();
+						float newDist = ((Vector3&)(b->position - s->boundingCube[i])).getLength();
 						if(dist > newDist)
 						{
 							dist = newDist;
@@ -337,8 +338,8 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					Vector3 ballFromWall = b->position - *n->wallPoints[j];
 
 					// check to see if the ball will collide with line
-					Vector3 *rej = rejection(ballFromWall,wall);
-					if (rej->getLength() <= b->radius)
+					Vector3 rej = rejection(ballFromWall,wall);
+					if (rej.getLength() <= b->radius)
 					{
 						// check to see if the ball is above or below the line and check to see if it is heading towards or away from line
 						Plane p = Plane(*n->wallPoints[j], *n->wallPoints[j+1], Point3(0,0,1));
@@ -408,6 +409,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 
 
 					}
+					//delete(rej);
 
 					//// get the projection!
 					//Vector3 tmp = v;

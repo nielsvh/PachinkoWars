@@ -19,29 +19,30 @@ public:
 	static Vector3 zAxis;
 };
 
- static Vector3& operator+(Vector3& lhs, Vector3& rhs)
+ static const Vector3& operator+(const Vector3& lhs, const Vector3& rhs)
 {
 	Vector3* newVec = new Vector3(lhs.x+rhs.x,lhs.y+rhs.y,lhs.z+rhs.z);
 	return *newVec;
 };
-static float& operator*(Vector3& lhs, Vector3& rhs)
+static const float& operator*(const Vector3& lhs, const Vector3& rhs)
 {
-	float* total = new float;
-	*total = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
-	return *total;
+	float total;
+	total = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+	return total;
 };
-static Vector3& operator-(Vector3& lhs, Vector3& rhs)
+static const Vector3& operator-(const Vector3& lhs, const Vector3& rhs)
 {
-	Vector3* newVec = new Vector3(lhs.x - rhs.x,lhs.y - rhs.y,lhs.z - rhs.z);
-	return *newVec;
+	float x = lhs.x - rhs.x,y = lhs.y - rhs.y,z = lhs.z - rhs.z;
+	Vector3 newVec = Vector3(x,y,z);
+	return newVec;
 };
-static Vector3& operator*(float lhs, Vector3& rhs)
+static const Vector3& operator*(float lhs, const Vector3& rhs)
 {
-	Vector3* newVec = new Vector3(lhs * rhs.x,lhs * rhs.y,lhs * rhs.z);
-	return *newVec;
+	Vector3 newVec = Vector3(lhs * rhs.x,lhs * rhs.y,lhs * rhs.z);
+	return newVec;
 };
 
-static Vector3& calculateUp(Vector3& lookAt, Vector3& eye, Vector3& up){
+static const Vector3& calculateUp(Vector3& lookAt, Vector3& eye, Vector3& up){
 	//Vector3* viewUp = new Vector3();
 	float length;
 
@@ -60,40 +61,44 @@ static Vector3& calculateUp(Vector3& lookAt, Vector3& eye, Vector3& up){
 	return up-((up* (*viewDir))*(*viewDir));
 };
 
-static Vector3& operator-(Point3& lhs, Point3& rhs)
+static const Vector3& operator-(const Point3& lhs, const Point3& rhs)
 {
 	return Vector3(lhs.x-rhs.x,lhs.y-rhs.y,lhs.z-rhs.z);
 };
 
-static Point3& operator+(Point3& p, Vector3& v)
+static const Point3& operator+(const Point3& p, const Vector3& v)
 {
-	Point3 *result = new  Point3(p.x+v.x, p.y+v.y, p.z+v.z);
-	return *result;
+	float x = p.x+v.x,y = p.y+v.y,z =  p.z+v.z;
+	Point3 result = Point3(x, y, z);
+	return result;
 };
 
-static Point3& operator-(Point3& p, Vector3& v)
+static const Point3& operator-(Point3& p, Vector3& v)
 {
 	Point3* result = new Point3(p.x-v.x, p.y-v.y, p.z-v.z);
 	return *result;
 };
 
-static Point3& operator*(float f, Point3& p)
+static const Point3& operator*(float f, const Point3& p)
 {
 	Point3* rtn = new Point3(p.x*f, p.y*f,p.z*f);
 	return *rtn;
 }
 
-static Vector3* project( Vector3 a, Vector3 b )
+static const Vector3& project( const Vector3& a, const Vector3& b )
 {
 	Vector3 bhat = b;
 	bhat.normalize();
-	Vector3 *c = new Vector3(a.getLength() * 1.0f/(a.getLength()*b.getLength()) * (a*b) * bhat);
+	Vector3 c = Vector3(((Vector3&)a).getLength() * 1.0f/(((Vector3&)a).getLength()*((Vector3&)b).getLength()) * (a*b) * bhat);
 	return c;
 }
 
-static Vector3* rejection(Vector3 a, Vector3 b)
+static const Vector3& rejection(const Vector3& a, const Vector3& b)
 {
 	Vector3 bhat = b;
 	bhat.normalize();
-	return new Vector3(a - (a*bhat) * bhat);
+	float adotb = (a*bhat);
+	Vector3 scaleB = adotb * bhat;
+	Vector3 aminb = a - scaleB;
+	return aminb;
 }
