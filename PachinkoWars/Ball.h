@@ -14,6 +14,7 @@ public:
 	void Velocity(Vector3 val) { velocity = val; }
 	float Mass() const { return mass; }
 	void Mass(float val) { mass = val; }
+	bool toDelete;
 private:
 	Vector3* gravity;
 	Vector3 velocity, acceleration;

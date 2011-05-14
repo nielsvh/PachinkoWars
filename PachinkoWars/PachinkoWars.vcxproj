@@ -65,6 +65,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BallHole.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Pin.cpp" />
@@ -81,6 +82,7 @@
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BallHole.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix33.h" />

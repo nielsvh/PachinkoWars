@@ -7,6 +7,7 @@
 #include "Ball.h"
 #include "Spinner.h"
 #include "Plane.h"
+#include "BallHole.h"
 
 using namespace std;
 
@@ -20,13 +21,25 @@ private:
 			tl = tr = bl = br = NULL;
 			hasBall = hasWall = false;
 		};
+		~MyNode()
+		{
+			if (this->bl != NULL)
+			{
+			delete this->bl;
+			delete this->br;
+			delete this->tl;
+			delete this->tr;
+			}
+			delete this->myObjects;
+			delete this->wallPoints;
+		}
 		MyNode(const MyNode& node)
 		{
 			hasBall = false;
 			hasWall = node.hasWall;
 			this->tree = node.tree;
 			this->myObjects = new vector<GameObject*>(*node.myObjects);
-			this->wallPoints = vector<Point3*>(node.wallPoints);
+			this->wallPoints = new vector<Point3*>(*node.wallPoints);
 			this->position = node.position;
 			this->width = node.width;
 			this->height = node.height;
@@ -45,7 +58,7 @@ private:
 		QuadTree* tree;
 		MyNode *tl, *tr, *bl, *br;
 		vector<GameObject*>* myObjects;
-		vector<Point3*> wallPoints;
+		vector<Point3*> *wallPoints;
 		Point3 *position;
 		float width, height;
 	};

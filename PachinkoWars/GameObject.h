@@ -3,7 +3,7 @@
 class GameObject
 {
 public:
-	enum type{BALL, PIN, SPINNER};
+	enum type{BALL, PIN, SPINNER, HOLE};
 	GameObject(void);
 	~GameObject(void);
 	Point3 position;

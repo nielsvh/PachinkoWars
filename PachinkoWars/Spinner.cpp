@@ -15,11 +15,12 @@ Spinner::Spinner(void)
 {
 }
 
-Spinner::Spinner( Point3 newPos, float size )
+Spinner::Spinner( Point3 newPos, float size, float m )
 {
 	position = newPos;
-	
+	mass = m;
 	radius = size;
+	objectType = SPINNER;
 	Init();
 }
 
@@ -48,16 +49,33 @@ void Spinner::Init()
 	for (int i = 0;i<24;i++)
 	{
 		points[i] = radius * staticPoints[i];
+		points[i] = points[i] + position;
 	}
 
 	for (int i = 0;i<8;i++)
 	{
 		boundingCube[i] = radius * boundingCube[i];
+		boundingCube[i] = boundingCube[i]+position;
 	}
 }
 
 void Spinner::Update()
 {
+	for (int i = 0;i<24;i++)
+	{
+		Vector3 v = points[i]-position;
+		Quaternion qv = Quaternion(v);
+		Quaternion invRot = rotation.Inverse();
+		Quaternion rot = rotation * qv;
+		rot = rot * invRot;
+		Point3 p = (Point3)(radius * staticPoints[i]);
+		points[i] = position + Point3(rot.x, rot.y, rot.z);
+	}
+	for (int i = 0;i<8;i++)
+	{
+		boundingCube[i] = radius * boundingCube[i];
+		boundingCube[i] = boundingCube[i]+position;
+	}
 }
 
 Spinner::~Spinner(void)
@@ -68,31 +86,31 @@ void Spinner::Draw()
 {
 	// 0 1 10 11
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(points[0].x + position.x,points[0].y + position.y,points[0].z + position.z);
-	glVertex3f(points[1].x + position.x,points[1].y + position.y,points[1].z + position.z);
-	glVertex3f(points[10].x + position.x,points[10].y + position.y,points[10].z + position.z);
-	glVertex3f(points[11].x + position.x,points[11].y + position.y,points[11].z + position.z);
+	glVertex3f(points[0].x,points[0].y,points[0].z);
+	glVertex3f(points[1].x,points[1].y,points[1].z);
+	glVertex3f(points[10].x,points[10].y,points[10].z);
+	glVertex3f(points[11].x,points[11].y,points[11].z);
 	glEnd();
 	// 1 2 3 4
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(points[1].x + position.x,points[1].y + position.y,points[1].z + position.z);
-	glVertex3f(points[2].x + position.x,points[2].y + position.y,points[2].z + position.z);
-	glVertex3f(points[3].x + position.x,points[3].y + position.y,points[3].z + position.z);
-	glVertex3f(points[4].x + position.x,points[4].y + position.y,points[4].z + position.z);
+	glVertex3f(points[1].x,points[1].y,points[1].z);
+	glVertex3f(points[2].x,points[2].y,points[2].z);
+	glVertex3f(points[3].x,points[3].y,points[3].z);
+	glVertex3f(points[4].x,points[4].y,points[4].z);
 	glEnd();
 	// 4 5 6 7
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(points[4].x + position.x,points[4].y + position.y,points[4].z + position.z);
-	glVertex3f(points[5].x + position.x,points[5].y + position.y,points[5].z + position.z);
-	glVertex3f(points[6].x + position.x,points[6].y + position.y,points[6].z + position.z);
-	glVertex3f(points[7].x + position.x,points[7].y + position.y,points[7].z + position.z);
+	glVertex3f(points[4].x,points[4].y,points[4].z);
+	glVertex3f(points[5].x,points[5].y,points[5].z);
+	glVertex3f(points[6].x,points[6].y,points[6].z);
+	glVertex3f(points[7].x,points[7].y,points[7].z);
 	glEnd();
 	// 4 8 9 1
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(points[4].x + position.x,points[4].y + position.y,points[4].z + position.z);
-	glVertex3f(points[8].x + position.x,points[8].y + position.y,points[8].z + position.z);
-	glVertex3f(points[9].x + position.x,points[9].y + position.y,points[9].z + position.z);
-	glVertex3f(points[1].x + position.x,points[1].y + position.y,points[1].z + position.z);
+	glVertex3f(points[4].x,points[4].y,points[4].z);
+	glVertex3f(points[8].x,points[8].y,points[8].z);
+	glVertex3f(points[9].x,points[9].y,points[9].z);
+	glVertex3f(points[1].x,points[1].y,points[1].z);
 	glEnd();
 
 	// 0 1 13 12
@@ -101,18 +119,18 @@ void Spinner::Draw()
 		if (i+13 <= 23)
 		{
 			glBegin(GL_LINE_LOOP);
-			glVertex3f(points[i].x + position.x,points[i].y + position.y,points[i].z + position.z);
-			glVertex3f(points[i+1].x + position.x,points[i+1].y + position.y,points[i+1].z + position.z);
-			glVertex3f(points[i+1+12].x + position.x,points[i+1+12].y + position.y,points[i+1+12].z + position.z);
-			glVertex3f(points[i+12].x + position.x,points[i+12].y + position.y,points[i+12].z + position.z);
+			glVertex3f(points[i].x,points[i].y,points[i].z);
+			glVertex3f(points[i+1].x,points[i+1].y,points[i+1].z);
+			glVertex3f(points[i+1+12].x,points[i+1+12].y,points[i+1+12].z);
+			glVertex3f(points[i+12].x,points[i+12].y,points[i+12].z);
 			glEnd();
 		}
 		else{
 			glBegin(GL_LINE_LOOP);
-			glVertex3f(points[i].x + position.x,points[i].y + position.y,points[i].z + position.z);
-			glVertex3f(points[0].x + position.x,points[0].y + position.y,points[0].z + position.z);
-			glVertex3f(points[12].x + position.x,points[12].y + position.y,points[12].z + position.z);
-			glVertex3f(points[i+12].x + position.x,points[i+12].y + position.y,points[i+12].z + position.z);
+			glVertex3f(points[i].x,points[i].y,points[i].z);
+			glVertex3f(points[0].x,points[0].y,points[0].z);
+			glVertex3f(points[12].x,points[12].y,points[12].z);
+			glVertex3f(points[i+12].x,points[i+12].y,points[i+12].z);
 			glEnd();
 		}
 	}

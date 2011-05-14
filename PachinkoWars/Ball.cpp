@@ -13,6 +13,7 @@ Ball::Ball( Point3 pos, Vector3* fG,float m)
 	radius = .15;
 	gravity = fG;
 	objectType = type::BALL;
+	toDelete = false;
 }
 
 
@@ -22,9 +23,12 @@ Ball::~Ball(void)
 
 void Ball::Update()
 {
+	if (!toDelete)
+	{
 	acceleration = *gravity;
 	velocity = velocity+*gravity;
 	position = position + velocity;
+	}
 }
 
 void Ball::Draw()

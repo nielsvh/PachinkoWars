@@ -8,6 +8,7 @@
 #include "QuadTree.h"
 #include "Ball.h"
 #include "Spinner.h"
+#include "BallHole.h"
 using namespace std;
 
 #define FILE_NAME "PACHINKO.txt"
@@ -31,6 +32,7 @@ public:
 	vector<Pin*> pins;
 	vector<Spinner*> spinners;
 	vector<Ball*> balls;
+	vector<BallHole*> holes;
 	QuadTree tree;
 	Vector3* fG;
 	vector<GameObject*> objects;

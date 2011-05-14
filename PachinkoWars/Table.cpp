@@ -22,7 +22,9 @@ void Table::init()
 	pins = vector<Pin*>();
 	spinners = vector<Spinner*>();
 	balls = vector<Ball*>();
-	balls.push_back(new Ball(Point3(0,2.5,0), fG, 1));
+	holes = vector<BallHole*>();
+	holes.push_back(new BallHole(Point3(0,.5,0),.5,1));
+	//balls.push_back(new Ball(Point3(0,2.5,0), fG, 1));// TEST BALL
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -63,6 +65,7 @@ void Table::init()
 	// insert the objects from the board into the quadtree
 	objects = vector<GameObject*>(pins.begin(), pins.end());
 	objects.insert(objects.end(), spinners.begin(), spinners.end());
+	objects.insert(objects.end(), holes.begin(), holes.end());
 	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
 	tree.AddTableWalls(tableWallPoints);
 }
@@ -193,7 +196,7 @@ void Table::FileIn()
 			y1 = atof(pch);
 			pch = strtok (NULL, " ");
 
-			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), .5));
+			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), .5, 10));
 		}
 		else if (line[0] == 'w')
 		{
@@ -235,6 +238,14 @@ void Table::FileIn()
 
 void Table::Update()
 {
+	for (int i = 0; i<balls.size();i++)
+	{
+		if (balls[i]->toDelete)
+		{
+			balls.erase(balls.begin()+i);
+			i = 0;
+		}
+	}
 	for (int i = 0; i<balls.size();i++)
 	{
 		balls[i]->Update();
@@ -286,6 +297,11 @@ void Table::Draw()
 		balls[i]->Draw();
 	}
 
+	for (int i = 0;i<holes.size();i++)
+	{
+		holes[i]->Draw();
+	}
+
 	glBegin(GL_LINE_STRIP);
 	for (int i = 0; i<tableWallPoints.size()-1;i++)
 	{
@@ -320,6 +336,7 @@ void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
 
 void Table::spawnBall()
 {
-	Ball *newBall = new Ball(Point3(-2,2.5,0),fG, .5);
+	Ball *newBall = new Ball(Point3(-4,16,0),fG, .5);
+	//newBall->Velocity(Vector3(-.2,.01,0));
 	balls.push_back(newBall);
 }

@@ -12,7 +12,7 @@ public:
 
 	double getLength(void);
 	void normalize(void);
-	Quaternion* inverse();
+	Quaternion Inverse();
 
 	float x,y,z,w;
 	static void getAxisAngle(Quaternion &q, Vector3 &v, float &angle)
@@ -42,18 +42,18 @@ public:
 		w = 0.0f;
 	}
 
-	Quaternion& operator*(Quaternion& rhs)
+	Quaternion& operator*(const Quaternion& rhs) const
 	{
 		/*a1a2-b1b2-c1c2-d1d2,
 		a1b2+b1a2+c1d2-d1c2,
 		a1c2-b1d2+c1a2+d1b2,
 		a1d2+b1c2-c1b2+d1a2;*/
-		Quaternion* tmp = new Quaternion(*this);
-		tmp->w = this->w*rhs.w - this->x*rhs.x - this->y*rhs.y - this->z*rhs.z;
-		tmp->x = this->w*rhs.x + this->x*rhs.w + this->y*rhs.z - this->z*rhs.y;
-		tmp->y = this->w*rhs.y - this->x*rhs.z + this->y*rhs.w + this->z*rhs.x;
-		tmp->z = this->w*rhs.z + this->x*rhs.y - this->y*rhs.x + this->z*rhs.w;
-		return *tmp;
+		Quaternion tmp =  Quaternion(*this);
+		tmp.w = this->w*rhs.w - this->x*rhs.x - this->y*rhs.y - this->z*rhs.z;
+		tmp.x = this->w*rhs.x + this->x*rhs.w + this->y*rhs.z - this->z*rhs.y;
+		tmp.y = this->w*rhs.y - this->x*rhs.z + this->y*rhs.w + this->z*rhs.x;
+		tmp.z = this->w*rhs.z + this->x*rhs.y - this->y*rhs.x + this->z*rhs.w;
+		return tmp;
 	}
 
 	Quaternion& operator+(Quaternion& rhs)

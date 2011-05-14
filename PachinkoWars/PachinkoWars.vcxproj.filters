@@ -57,6 +57,9 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BallHole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Maths.h">
@@ -102,6 +105,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BallHole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

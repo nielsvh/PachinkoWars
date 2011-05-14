@@ -33,6 +33,7 @@ Quaternion::Quaternion(float alpha, float beta, float gamma)
 	z = (-s1 * s3 + c1 * s2 * c3 +s2) / w4 ;
 }
 
+// angle in DEGREES
 Quaternion::Quaternion( Vector3& axis, float angle )
 {
 	float rad = angle * PI / 180;
@@ -76,8 +77,8 @@ Vector3* Quaternion::rotate(const Vector3 vector)const
 					pMult*vector.z+vMult*z + crossMult*(x*vector.y-y*vector.x));
 }
 
-Quaternion* Quaternion::inverse()
+Quaternion Quaternion::Inverse()
 {
-	Quaternion* tmp = new Quaternion(this->w, -this->x, -this->y, -this->z);
+	Quaternion tmp = Quaternion(this->w, -this->x, -this->y, -this->z);
 	return tmp;
 }

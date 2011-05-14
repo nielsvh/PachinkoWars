@@ -19,7 +19,17 @@ Pin::Pin( Point3 myPosition )
 	};
 	for (int i = 0;i<22;i++)
 	{
-		points[i] =  apoints[i]+myPosition;
+		points[i] =  (Point3&)(.2*apoints[i]) + myPosition;
+	}
+	for (int i = 0;i<22;i++)
+	{
+		Vector3 v = points[i] - position;
+		Quaternion qv = Quaternion(v);
+		Quaternion rotation = Quaternion(Vector3(1,0,0),90);
+		Quaternion invRotat = rotation.Inverse();
+		Quaternion rot = rotation * qv;
+		rot = rot * invRotat;
+		points[i] = position + Vector3(rot.x, rot.y, rot.z);
 	}
 }
 
@@ -30,7 +40,7 @@ Pin::~Pin(void)
 
 void Pin::Draw()
 {
-	/*glBegin(GL_LINE_LOOP);
+	glBegin(GL_LINE_LOOP);
 	glVertex3f(points[0].x, points[0].y, points[0].z);
 	glVertex3f(points[2].x, points[2].y, points[2].z);
 	glVertex3f(points[3].x, points[3].y, points[3].z);
@@ -58,9 +68,9 @@ void Pin::Draw()
 	glVertex3f(points[19].x, points[19].y, points[19].z);
 	glVertex3f(points[18].x, points[18].y, points[18].z);
 	glVertex3f(points[17].x, points[17].y, points[17].z);
-	glEnd();*/
+	glEnd();
 
-	if (isColliding)
+	/*if (isColliding)
 	{
 		glColor3f(1,0,0);
 	}
@@ -71,5 +81,5 @@ void Pin::Draw()
 	glBegin(GL_POINTS);
 	glVertex3f(position.x, position.y, position.z);
 	glEnd();
-	glColor3f(1,1,1);
+	glColor3f(1,1,1);*/
 }
