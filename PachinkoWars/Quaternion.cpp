@@ -66,13 +66,13 @@ void Quaternion::normalize(void)
 	this->w/=l;this->x/=l;this->y/=l;this->z/=l;
 }
 
-Vector3* Quaternion::rotate(const Vector3 vector)const
+const Vector3 Quaternion::rotate(const Vector3& vector)const
 {
 	float vMult = 2.0f*(x*vector.x+y*vector.y+z*vector.z);
 	float crossMult = 2.0f*w;
 	float pMult = crossMult*w - 1.0f;
 
-	return new Vector3(	pMult*vector.x+vMult*x + crossMult*(y*vector.z-z*vector.y),
+	return Vector3(	pMult*vector.x+vMult*x + crossMult*(y*vector.z-z*vector.y),
 					pMult*vector.y+vMult*y + crossMult*(z*vector.x-x*vector.z),
 					pMult*vector.z+vMult*z + crossMult*(x*vector.y-y*vector.x));
 }

@@ -240,6 +240,9 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 			float minDist = (*n->myObjects)[i]->radius+(*n->myObjects)[j]->radius;
 			if (diff.getLength()<minDist)
 			{
+				//////////////////////////////////////////////////////////////////////////
+				// BALL
+				//////////////////////////////////////////////////////////////////////////
 				if ((*n->myObjects)[j]->objectType ==  GameObject::type::BALL)
 				{
 					Vector3 newV = diff;
@@ -249,6 +252,9 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
 					((Ball*)(*n->myObjects)[i])->Velocity(newV);
 				}
+				//////////////////////////////////////////////////////////////////////////
+				// Pin
+				//////////////////////////////////////////////////////////////////////////
 				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::PIN)
 				{
 					Vector3 newV = diff;
@@ -260,6 +266,9 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					newV = newV + Vector3(.001,0,0);
 					((Ball*)(*n->myObjects)[i])->Velocity(newV);
 				}
+				//////////////////////////////////////////////////////////////////////////
+				// SPINNER
+				//////////////////////////////////////////////////////////////////////////
 				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
 				{
 					Ball* b = (Ball*)(*n->myObjects)[i];
@@ -287,15 +296,29 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					tempV.normalize();
 					Vector3 proj = (closest*tempV)*tempV;
 					float temp = proj.getLength();
+					// check if in the bounding box
 					if(diff.getLength() > temp + b->radius)
 					{
 						continue;
 					}
+					// then it needs to go, "Hey!".
+					if (index == 0 || index == 4)
+					{
+						//planes 0 1 2 3
+					}
+					else if (index == 1 || index == 5)
+					{
+						//planes 3 4 5 6
+					}
+					else if (index == 2 || index == 6)
+					{
+						//planes 6 7 8 9
+					}
+					else if (index == 3 || index == 7)
+					{
+						//planes 9 10 11 0
+					}
 
-					// find the current position of the bar
-					float angle = 1.0;
-					Quaternion qsdf = Quaternion(Vector3::zAxis,angle);
-					s->Rotation(qsdf);
 					// find the force applied to the bar
 					// ft = dp/dt = m*dv/dt
 					// find perpendicular momentum
@@ -317,11 +340,14 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					s->AngularVel(myRotation * *s->Tensor()->inverse() * myRotationT * s->MyL());
 
 					//q(n+1) = q(n) + h(.5 * w(n)*q(n))
-					s->Rotation(s->Rotation() + .05*(.5 * Quaternion(s->AngularVel()) * s->Rotation()));
+					s->Rotation(s->Rotation() + .05f*(.5 * Quaternion(s->AngularVel()) * s->Rotation()));
 					Quaternion q = s->Rotation();
 					q.normalize();
 					s->Rotation(q);
 				}
+				//////////////////////////////////////////////////////////////////////////
+				// BALLHOLE
+				//////////////////////////////////////////////////////////////////////////
 				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::HOLE)
 				{
 					Ball *b = (Ball*)(*n->myObjects)[i];

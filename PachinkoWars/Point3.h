@@ -12,22 +12,22 @@ public:
 	~Point3(void);
 	float x,y,z;
 
-	Point3& operator*(double rhs)
+	const Point3 operator*(const double rhs)
 	{
-		Point3* tmp = new Point3(*this);
-		tmp->x*=rhs;
-		tmp->y*=rhs;
-		tmp->z*=rhs;
-		return *tmp;
+		Point3 tmp;
+		tmp.x= rhs * this->x;
+		tmp.y=rhs * this->y;
+		tmp.z=rhs * this->z;
+		return tmp;
 	}
 
-	Point3& operator+(Point3& rhs)
+	const Point3 operator+(const Point3& rhs) const
 	{
-		Point3* tmp = new Point3(*this);
-		tmp->x += rhs.x;
-		tmp->y+=rhs.y;
-		tmp->z+=rhs.z;
-		return *tmp;
+		Point3 tmp;
+		tmp.x = rhs.x + this->x;
+		tmp.y=rhs.y + this->y;
+		tmp.z=rhs.z + this->z;
+		return tmp;
 	}
 };
 

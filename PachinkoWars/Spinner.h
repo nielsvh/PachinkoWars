@@ -2,6 +2,7 @@
 #include <gl/glut.h>
 #include "GameObject.h"
 #include "Matrix33.h"
+#include "Plane.h"
 
 class Spinner:public GameObject
 {
@@ -23,6 +24,8 @@ public:
 	void AngularVel(Vector3 val) { angularVel = val; }
 	Matrix33* Tensor() const { return tensor; }
 	void Tensor(Matrix33* val) { tensor = val; }
+	Plane* Planes() const { return planes; }
+	void Planes(Plane* val) { planes = val; }
 
 private:
 	float mass;
@@ -33,5 +36,6 @@ private:
 	Matrix33* tensor;
 	Vector3 myL;
 	Vector3 lastTorque;
+	Plane* planes;
 };
 

@@ -17,6 +17,7 @@ Spinner::Spinner(void)
 
 Spinner::Spinner( Point3 newPos, float size, float m )
 {
+	planes = new Plane[12];
 	position = newPos;
 	mass = m;
 	radius = size;
@@ -57,6 +58,22 @@ void Spinner::Init()
 		boundingCube[i] = radius * boundingCube[i];
 		boundingCube[i] = boundingCube[i]+position;
 	}
+
+	planes[0] = Plane(points[5], points[17], points[6]);
+	planes[1] = Plane(points[6], points[18], points[7]);
+	planes[2] = Plane(points[7], points[19], points[8]);
+
+	planes[3] =  Plane(points[8], points[20], points[9]);
+	planes[4] =  Plane(points[9], points[21], points[10]);
+	planes[5] =  Plane(points[10], points[22], points[11]);
+
+	planes[6] =  Plane(points[11], points[23], points[0]);
+	planes[7] =  Plane(points[0], points[12], points[1]);
+	planes[8] =  Plane(points[1], points[13], points[2]);
+
+	planes[9] =  Plane(points[2], points[14], points[3]);
+	planes[10] =  Plane(points[3], points[15], points[4]);
+	planes[11] =  Plane(points[4], points[16], points[5]);
 }
 
 void Spinner::Update()
@@ -76,6 +93,22 @@ void Spinner::Update()
 		boundingCube[i] = radius * boundingCube[i];
 		boundingCube[i] = boundingCube[i]+position;
 	}
+
+	planes[0] = Plane(points[5], points[17], points[6]);
+	planes[1] = Plane(points[6], points[18], points[7]);
+	planes[2] = Plane(points[7], points[19], points[8]);
+
+	planes[3] =  Plane(points[8], points[20], points[9]);
+	planes[4] =  Plane(points[9], points[21], points[10]);
+	planes[5] =  Plane(points[10], points[22], points[11]);
+
+	planes[6] =  Plane(points[11], points[23], points[0]);
+	planes[7] =  Plane(points[0], points[12], points[1]);
+	planes[8] =  Plane(points[1], points[13], points[2]);
+
+	planes[9] =  Plane(points[2], points[14], points[3]);
+	planes[10] =  Plane(points[3], points[15], points[4]);
+	planes[11] =  Plane(points[4], points[16], points[5]);
 }
 
 Spinner::~Spinner(void)
