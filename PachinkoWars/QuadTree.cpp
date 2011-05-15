@@ -304,19 +304,26 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					// then it needs to go, "Hey!".
 					if (index == 0 || index == 4)
 					{
-						//planes 0 1 2 3
+						int rtn = CheckWalls(s->Planes()[0],s->Planes()[1],s->Planes()[2],s->Planes()[3], b);
 					}
 					else if (index == 1 || index == 5)
 					{
 						//planes 3 4 5 6
+						int rtn = CheckWalls(s->Planes()[3],s->Planes()[4],s->Planes()[5],s->Planes()[6], b);
 					}
 					else if (index == 2 || index == 6)
 					{
 						//planes 6 7 8 9
+						int rtn = CheckWalls(s->Planes()[6],s->Planes()[7],s->Planes()[8],s->Planes()[9], b);
 					}
 					else if (index == 3 || index == 7)
 					{
 						//planes 9 10 11 0
+						int rtn = CheckWalls(s->Planes()[9],s->Planes()[10],s->Planes()[11],s->Planes()[12], b);
+					}
+					else
+					{
+						printf("There was a problem somewhere, I don't know what is even going on!");
 					}
 
 					// find the force applied to the bar
@@ -581,4 +588,111 @@ void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
 
 	n->hasWall = true;
 	n->wallPoints->push_back(p);
+}
+
+
+//************************************
+// Method:    CheckWalls
+// FullName:  QuadTree::CheckWalls
+// Access:    private 
+// Returns:   int describing what wall is collided with
+// Qualifier:
+// Parameter: Plane pl0
+// Parameter: Plane pl1
+// Parameter: Plane pl2
+// Parameter: Plane pl3
+// Parameter: Ball * b
+//************************************
+int QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b )
+{
+	//planes 0 1 2 3
+	//is behind bools!
+	bool p0,p1,p2,p3;
+	p0 = (pl0.ClosestPointToPoint(b->Position()) - b->Position()).getLength()<=b->radius ? true:false;
+	p1 = (pl1.ClosestPointToPoint(b->Position()) - b->Position()).getLength()<=b->radius ? true:false;
+	p2 = (pl2.ClosestPointToPoint(b->Position()) - b->Position()).getLength()<=b->radius ? true:false;
+	p3 = (pl3.ClosestPointToPoint(b->Position()) - b->Position()).getLength()<=b->radius ? true:false;
+
+	// if not behind p0 or p3, then it is outside the the cube to begin with. Get that outa here!
+	if (!p0 && !p3)
+	{
+		return;
+	}
+
+	// check to see what walls the ball is behind and return something that tells us what happened.
+	if (p0)
+	{
+		//p0
+		if (p3)
+		{
+			//p0 p3
+			if (p1)
+			{
+				//p0 p3 p1 p2
+				if (p2)
+				{
+					// check normals of p1&&p2 vs ball.velocity
+				}
+				//p0 p3 p1 !p2
+				else
+				{
+					// check normals of p0&&p1 vs ball.velocity
+				}
+			}
+			// else !p1
+			//p0 p3
+			else
+			{
+				// p0 p3 !p1 p2
+				if (p2)
+				{
+					// check normals of p2&&p3 vs ball.velocity
+				}
+				// p0 p3 !p1 !p2
+				else
+				{
+					// inside the gap!
+				}
+			}
+		}
+		// else !p3
+		else
+		{
+			// p0 !p3 p1
+			if (p1)
+			{
+				// p0 !p3 p1 p2
+				if (p2)
+				{
+					// check normals of p1&&p2 vs ball.velocity
+				}
+				// p0 !p3 p1 !p2
+				else
+				{
+					// check normals of p0&&p1 vs ball.velocity
+				}
+			}
+			// p0 !p3 !p1
+			else
+			{
+				// p0 !p3 !p1 p2
+				if (p2)
+				{
+					// check normals of p2&&p3 vs ball.velocity
+				}
+				// p0 !p3 !p1 !p2
+				else
+				{
+					// inside the gap!
+				}
+			}
+		}
+	}
+	// !p0 p3
+	else if(p3)
+	{
+		if (p1 && !p2)
+		{
+		}
+	}
 }

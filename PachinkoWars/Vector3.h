@@ -11,7 +11,7 @@ public:
 	float x,y,z;
 
 	Vector3& cross(const Vector3& other) const;
-	float getLength(void);
+	float getLength(void) const;
 	Vector3* normalize(void);
 	
 	static Vector3 xAxis;

@@ -79,5 +79,8 @@ private:
 	void SplitNode(MyNode* n, int steps);
 	void Draw(MyNode* n);
 	void CheckCollisionsNode(MyNode* n);
+
+	int CheckWalls(Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b );
+
 };
 

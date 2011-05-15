@@ -9,5 +9,6 @@ public:
 	~Plane(void);
 	Vector3 normal;
 	Point3 ClosestPointToPoint(Point3 p);
+	bool Behind( Point3 point );
 };
 

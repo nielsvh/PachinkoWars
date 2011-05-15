@@ -26,7 +26,7 @@ Vector3& Vector3::cross(const Vector3& other) const
 	return *result;
 }
 
-float Vector3::getLength(void)
+float Vector3::getLength(void) const
 {
 	float ls = this->x*this->x + this->y*this->y + this->z*this->z;
 	if (ls<.0001)

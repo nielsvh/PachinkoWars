@@ -27,3 +27,13 @@ Point3 Plane::ClosestPointToPoint( Point3 p )
 	Vector3 proj = (v*normal)*normal;
 	return p - proj;
 }
+
+bool Plane::Behind( Point3 point )
+{
+	float dot = normal * (points[0] - point);
+	if (dot >= 0)
+	{
+		return false;
+	}
+	return true;
+}
