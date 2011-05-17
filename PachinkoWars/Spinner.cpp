@@ -11,6 +11,10 @@ Point3 Spinner::staticPoints[24]= {
 	Point3(.2,-1,0),Point3(.2,-.2,0),Point3(1,-.2,0)
 };
 
+Point3 Spinner::staticBoundingCube[8] = {
+	Point3(-1,-1,0),Point3(1,-1,0),Point3(1,1,0),Point3(-1,1,0),
+	Point3(-1,-1,1),Point3(1,-1,1),Point3(1,1,1),Point3(-1,1,1)};
+
 Spinner::Spinner(void)
 {
 }
@@ -37,26 +41,14 @@ void Spinner::Init()
 	tensor->myMatrix[8] = mass*radius*radius;
 	myL = *tensor * angularVel;
 
-	boundingCube[0] = Point3(-1,-1,0);
-	boundingCube[1] = Point3(1,-1,0);
-	boundingCube[2] = Point3(1,1,0);
-	boundingCube[3] = Point3(-1,1,0);
-
-	boundingCube[4] = Point3(-1,-1,1);
-	boundingCube[5] = Point3(1,-1,1);
-	boundingCube[6] = Point3(1,1,1);
-	boundingCube[7] = Point3(-1,1,1);
-
 	for (int i = 0;i<24;i++)
 	{
-		points[i] = radius * staticPoints[i];
-		points[i] = points[i] + position;
+		points[i] = radius * staticPoints[i] + position;
 	}
 
 	for (int i = 0;i<8;i++)
 	{
-		boundingCube[i] = radius * boundingCube[i];
-		boundingCube[i] = boundingCube[i]+position;
+		boundingCube[i] = radius * staticBoundingCube[i]+position;
 	}
 
 	planes[0] = Plane(points[5], points[17], points[6]);
@@ -90,8 +82,7 @@ void Spinner::Update()
 	}
 	for (int i = 0;i<8;i++)
 	{
-		boundingCube[i] = radius * boundingCube[i];
-		boundingCube[i] = boundingCube[i]+position;
+		boundingCube[i] = radius * staticBoundingCube[i]+position;
 	}
 
 	planes[0] = Plane(points[5], points[17], points[6]);
@@ -167,4 +158,11 @@ void Spinner::Draw()
 			glEnd();
 		}
 	}
+
+	glBegin(GL_LINE_LOOP);
+	for (int i = 0;i<8;i++)
+	{
+		glVertex3f(boundingCube[i].x, boundingCube[i].y, boundingCube[i].z);
+	}
+	glEnd();
 }

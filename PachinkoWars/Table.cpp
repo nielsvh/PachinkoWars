@@ -63,9 +63,9 @@ void Table::init()
 	tree = QuadTree();
 
 	// insert the objects from the board into the quadtree
-	objects = vector<GameObject*>(pins.begin(), pins.end());
+	//objects = vector<GameObject*>(pins.begin(), pins.end());
 	objects.insert(objects.end(), spinners.begin(), spinners.end());
-	objects.insert(objects.end(), holes.begin(), holes.end());
+	//objects.insert(objects.end(), holes.begin(), holes.end());
 	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
 	tree.AddTableWalls(tableWallPoints);
 }
@@ -196,7 +196,7 @@ void Table::FileIn()
 			y1 = atof(pch);
 			pch = strtok (NULL, " ");
 
-			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), .5, 10));
+			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), 2, 10));
 		}
 		else if (line[0] == 'w')
 		{
@@ -257,8 +257,8 @@ void Table::Update()
 	}
 	
 	// the quad tree needs to be rebuilt every frame. Add the moving parts to the tree and let it build
-	vector<GameObject*> tmp = vector<GameObject*>(balls.begin(), balls.end());
-	tree.AddMovingObjects(tmp);
+	movingObjects = vector<GameObject*>(balls.begin(), balls.end());
+	tree.AddMovingObjects(movingObjects);
 	// check for collision
 	tree.CheckCollisions();
 	//tree.BruteCollisions(pins, balls);
@@ -283,7 +283,7 @@ void Table::Draw()
 	// draw the pins
 	for (int i = 0;i<pins.size();i++)
 	{
-		pins[i]->Draw();
+		//pins[i]->Draw();
 	}
 
 	for (int i = 0;i<spinners.size();i++)
@@ -299,7 +299,7 @@ void Table::Draw()
 
 	for (int i = 0;i<holes.size();i++)
 	{
-		holes[i]->Draw();
+		//holes[i]->Draw();
 	}
 
 	glBegin(GL_LINE_STRIP);
@@ -334,9 +334,9 @@ void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
 	tableWallPoints.push_back(new Point3(p3));
 }
 
-void Table::spawnBall()
+void Table::SpawnBall()
 {
-	Ball *newBall = new Ball(Point3(-4,16,0),fG, .5);
+	Ball *newBall = new Ball(Point3(0,8,0),fG, .5);
 	//newBall->Velocity(Vector3(-.2,.01,0));
 	balls.push_back(newBall);
 }

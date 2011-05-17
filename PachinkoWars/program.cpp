@@ -8,7 +8,7 @@
 using namespace std;
 
 
-#define FPS 1000/30
+#define FPS 1
 
 Table *table;
 

@@ -33,12 +33,13 @@ public:
 	vector<Spinner*> spinners;
 	vector<Ball*> balls;
 	vector<BallHole*> holes;
+	vector<GameObject*> movingObjects;
 	QuadTree tree;
 	Vector3* fG;
 	vector<GameObject*> objects;
 	vector<Point3*> tableWallPoints;
 	static Table* thisTable;
-	void spawnBall();
+	void SpawnBall();
 
 	static void keyboardS (int key, int x, int y)
 	{
@@ -69,7 +70,7 @@ public:
 			exit(0);
 			break;
 		case ' ':
-			thisTable->spawnBall();
+			thisTable->SpawnBall();
 			break;
 		}
 	}

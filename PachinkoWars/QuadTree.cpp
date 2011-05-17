@@ -15,16 +15,16 @@ void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, f
 {
 
 	rootStatic = new MyNode();
-	rootStatic->myObjects = new vector<GameObject*>();
-	rootStatic->wallPoints = new vector<Point3*>();
+	rootStatic->myObjects = vector<GameObject*>();
+	rootStatic->wallPoints = vector<Point3*>();
 	//myObjects = vector<GameObject*>();
 	for (int i = 0; i<objects.size();i++)
 	{
 		//myObjects.push_back(objects[i]);
-		rootStatic->myObjects->push_back(objects[i]);
+		rootStatic->myObjects.push_back(objects[i]);
 	}
 
-	rootStatic->tree = this;
+//	rootStatic->tree = this;
 	rootStatic->width = width;
 	rootStatic->height = height;
 	rootStatic->position = location;
@@ -33,11 +33,11 @@ void QuadTree::BuildStaticTree( vector<GameObject*> objects, Point3* location, f
 
 void QuadTree::SplitNode( MyNode* n, int steps )
 {
-	if (steps>4 || n->myObjects->size() < TOLERANCE)
+	if (steps>4 || n->myObjects.size() < TOLERANCE)
 	{
-		for (int i = 0;i<n->myObjects->size();i++)
+		for (int i = 0;i<n->myObjects.size();i++)
 		{
-			if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
+			if ((n->myObjects)[i]->objectType == GameObject::type::BALL)
 			{
 				n->hasBall = true;
 				break;
@@ -67,10 +67,10 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	n->tl->position = new Point3(n->position->x, n->position->y+h, n->position->z);
 	n->tr->position = new Point3(n->position->x+w, n->position->y+h, n->position->z);
 
-	n->tl->myObjects = new vector<GameObject*>();
-	n->tr->myObjects = new vector<GameObject*>();
-	n->bl->myObjects = new vector<GameObject*>();
-	n->br->myObjects = new vector<GameObject*>();
+	n->tl->myObjects = vector<GameObject*>();
+	n->tr->myObjects = vector<GameObject*>();
+	n->bl->myObjects = vector<GameObject*>();
+	n->br->myObjects = vector<GameObject*>();
 
 	n->tl->wallPoints = n->wallPoints;
 	n->tr->wallPoints = n->wallPoints;
@@ -81,35 +81,35 @@ void QuadTree::SplitNode( MyNode* n, int steps )
 	n->tr->hasWall = n->hasWall;
 	n->bl->hasWall = n->hasWall;
 	n->br->hasWall = n->hasWall;
-	for (int i = 0;i<n->myObjects->size();i++)
+	for (int i = 0;i<n->myObjects.size();i++)
 	{
-		GameObject* obj = (*n->myObjects)[i];
-		if ((*n->myObjects)[i]->position.x >= n->tr->position->x)
+		GameObject* obj = (n->myObjects)[i];
+		if ((n->myObjects)[i]->position.x >= n->tr->position->x)
 		{
-			if ((*n->myObjects)[i]->position.y >= n->tr->position->y)
+			if ((n->myObjects)[i]->position.y >= n->tr->position->y)
 			{
-				n->tr->myObjects->push_back((*n->myObjects)[i]);
+				n->tr->myObjects.push_back((n->myObjects)[i]);
 			}
 			else
 			{
-				n->br->myObjects->push_back((*n->myObjects)[i]);
+				n->br->myObjects.push_back((n->myObjects)[i]);
 			}
 		}
 		else
 		{
-			if ((*n->myObjects)[i]->position.y >= n->tl->position->y)
+			if ((n->myObjects)[i]->position.y >= n->tl->position->y)
 			{
-				n->tl->myObjects->push_back((*n->myObjects)[i]);
+				n->tl->myObjects.push_back((n->myObjects)[i]);
 			}
 			else
 			{
-				n->bl->myObjects->push_back((*n->myObjects)[i]);
+				n->bl->myObjects.push_back((n->myObjects)[i]);
 			}
 		}
 	}
 	// for now don't remove objects from parent nodes
 
-	n->tl->tree = n->tr->tree = n->bl->tree = n->br->tree = this;
+//	n->tl->tree = n->tr->tree = n->bl->tree = n->br->tree = this;
 
 	SplitNode(n->tl, steps+1);
 
@@ -136,7 +136,7 @@ void QuadTree::InsertObject( GameObject* obj, MyNode* n, int steps )
 	{
 		// after all the objects have been added, split the nodes based off of their depth and number of object inside.
 		n->hasBall = true;
-		n->myObjects->push_back(obj);
+		n->myObjects.push_back(obj);
 		//SplitNode(n,steps);
 		return;
 	}
@@ -202,7 +202,7 @@ void QuadTree::BruteCollisions(vector<Pin*> pins, vector<Ball*> balls)
 void QuadTree::CheckCollisions()
 {
 	CheckCollisionsNode(rootNode);
-	delete(rootNode);
+	//delete(rootNode);
 }
 
 void QuadTree::CheckCollisionsNode(MyNode* n)
@@ -219,146 +219,172 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 	{
 		return;
 	}
-	else if(n->myObjects->size()<2 && !n->hasWall)//Only contains the ball
+	else if(n->myObjects.size()<2 && !n->hasWall)//Only contains the ball
 	{
 		return;
 	}
 
 	// check collisions with objects
-	for (int i = 0;i<n->myObjects->size();i++)
+	for (int i = 0;i<n->myObjects.size();i++)
 	{
-		if ((*n->myObjects)[i]->objectType !=  GameObject::type::BALL)
+		if ((n->myObjects)[i]->objectType !=  GameObject::type::BALL)
 		{
 			continue;
 		}
-		for (int j = 0;j<n->myObjects->size();j++)
+		for (int j = 0;j<n->myObjects.size();j++)
 		{
 			if (i == j)
 			continue;
 
-			Vector3 diff = (*n->myObjects)[i]->position-(*n->myObjects)[j]->position;
-			float minDist = (*n->myObjects)[i]->radius+(*n->myObjects)[j]->radius;
+			Vector3 diff = (n->myObjects)[i]->position-(n->myObjects)[j]->position;
+			float minDist = (n->myObjects)[i]->radius+(n->myObjects)[j]->radius;
 			if (diff.getLength()<minDist)
 			{
 				//////////////////////////////////////////////////////////////////////////
 				// BALL
 				//////////////////////////////////////////////////////////////////////////
-				if ((*n->myObjects)[j]->objectType ==  GameObject::type::BALL)
+				if ((n->myObjects)[j]->objectType ==  GameObject::type::BALL)
 				{
 					Vector3 newV = diff;
 					newV.normalize();
 					Vector3 tmpV = minDist * newV;
-					(*n->myObjects)[i]->Position((*n->myObjects)[j]->position + tmpV);
-					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
-					((Ball*)(*n->myObjects)[i])->Velocity(newV);
+					(n->myObjects)[i]->Position((n->myObjects)[j]->position + tmpV);
+					newV = ((Ball*)(n->myObjects)[i])->Velocity().getLength() * .7 * newV;
+					((Ball*)(n->myObjects)[i])->Velocity(newV);
 				}
 				//////////////////////////////////////////////////////////////////////////
 				// Pin
 				//////////////////////////////////////////////////////////////////////////
-				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::PIN)
+				else if ((n->myObjects)[j]->objectType ==  GameObject::type::PIN)
 				{
 					Vector3 newV = diff;
 					newV.normalize();
 					Vector3 tmpV = minDist * newV;
-					(*n->myObjects)[i]->Position((*n->myObjects)[j]->position + tmpV);
-					newV = ((Ball*)(*n->myObjects)[i])->Velocity().getLength() * .7 * newV;
+					(n->myObjects)[i]->Position((n->myObjects)[j]->position + tmpV);
+					newV = ((Ball*)(n->myObjects)[i])->Velocity().getLength() * .7 * newV;
 					// to prevent the balls from getting stuck on the top of pins, we add just a little to the x in velocity.
 					newV = newV + Vector3(.001,0,0);
-					((Ball*)(*n->myObjects)[i])->Velocity(newV);
+					((Ball*)(n->myObjects)[i])->Velocity(newV);
 				}
 				//////////////////////////////////////////////////////////////////////////
 				// SPINNER
 				//////////////////////////////////////////////////////////////////////////
-				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
+				else if ((n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
 				{
-					Ball* b = (Ball*)(*n->myObjects)[i];
-					Spinner* s = (Spinner*)(*n->myObjects)[j];
-					float bEnergy = .5 * b->Mass() * b->Velocity() * b->Velocity();
+					Ball* b = (Ball*)(n->myObjects)[i];
+					Spinner* s = (Spinner*)(n->myObjects)[j];
 
-					// need to check p1, then p2 and p4 or p3, then p2 and p4
-					Vector3 vTemp = (Vector3&)(b->position - s->boundingCube[0]);
-					float dist = vTemp.getLength();
-					//printf("Dist:%f s.x:%f s.y:%f b.x:%f b.y:%f\n",dist,s->boundingCube[0].x,s->boundingCube[0].y,b->Position().x, b->Position().y);
-					int index = 0;
-					for (int i=1;i < 8;i++)
+					Plane bc1 = Plane(s->boundingCube[0],s->boundingCube[1],s->boundingCube[4]);
+					Plane bc2 = Plane(s->boundingCube[1],s->boundingCube[2],s->boundingCube[5]); 
+					Plane bc3 = Plane(s->boundingCube[2],s->boundingCube[3],s->boundingCube[6]);
+					Plane bc4 = Plane(s->boundingCube[3],s->boundingCube[0],s->boundingCube[7]);
+
+					
+					Vector3 pdiff = (b->Position()-bc1.ClosestPointToPoint(b->Position()));
+					if (pdiff.getLength()<= b->radius || bc1.normal * pdiff <= 0)
 					{
-						Vector3 v = (Vector3&)(b->position - s->boundingCube[i]);
-						float newDist = v.getLength();
-						if(dist > newDist)
+						pdiff = (b->Position()-bc2.ClosestPointToPoint(b->Position()));
+						if (pdiff.getLength()<= b->radius || bc2.normal * pdiff <= 0)
 						{
-							dist = newDist;
-							index = i;
+							pdiff = (b->Position()-bc3.ClosestPointToPoint(b->Position()));
+							if (pdiff.getLength()<= b->radius || bc3.normal * pdiff <= 0)
+							{
+								pdiff = (b->Position()-bc4.ClosestPointToPoint(b->Position()));
+								if (pdiff.getLength()<= b->radius || bc4.normal * pdiff <= 0)
+								{
+									printf("INSIDE YOU!\n");
+								}
+							}
 						}
 					}
 
-					Vector3 closest = s->boundingCube[index] - s->position;
-					Vector3 tempV = diff;
-					tempV.normalize();
-					Vector3 proj = (closest*tempV)*tempV;
-					float temp = proj.getLength();
-					// check if in the bounding box
-					if(diff.getLength() > temp + b->radius)
-					{
-						continue;
-					}
-					// then it needs to go, "Hey!".
-					if (index == 0 || index == 4)
-					{
-						int rtn = CheckWalls(s->Planes()[0],s->Planes()[1],s->Planes()[2],s->Planes()[3], b);
-					}
-					else if (index == 1 || index == 5)
-					{
-						//planes 3 4 5 6
-						int rtn = CheckWalls(s->Planes()[3],s->Planes()[4],s->Planes()[5],s->Planes()[6], b);
-					}
-					else if (index == 2 || index == 6)
-					{
-						//planes 6 7 8 9
-						int rtn = CheckWalls(s->Planes()[6],s->Planes()[7],s->Planes()[8],s->Planes()[9], b);
-					}
-					else if (index == 3 || index == 7)
-					{
-						//planes 9 10 11 0
-						int rtn = CheckWalls(s->Planes()[9],s->Planes()[10],s->Planes()[11],s->Planes()[12], b);
-					}
-					else
-					{
-						printf("There was a problem somewhere, I don't know what is even going on!");
-					}
-
-					// find the force applied to the bar
-					// ft = dp/dt = m*dv/dt
-					// find perpendicular momentum
-					Vector3 totalForce = bEnergy * b->Velocity();
 
 
-					// t = r X F
-					Vector3 torque = diff.cross(totalForce);
+					//float bEnergy = .5 * b->Mass() * b->Velocity() * b->Velocity();
 
-					Vector3 dL = .05 * torque;
+					//// need to check p1, then p2 and p4 or p3, then p2 and p4
+					//Vector3 vTemp = (Vector3&)(b->position - s->boundingCube[0]);
+					//float dist = vTemp.getLength();
+					//int index = 0;
+					//for (int i=1;i < 8;i++)
+					//{
+					//	Vector3 v = (Vector3&)(b->position - s->boundingCube[i]);
+					//	float newDist = v.getLength();
+					//	if(dist > newDist)
+					//	{
+					//		dist = newDist;
+					//		index = i;
+					//	}
+					//}
 
-					// find the rotation matrix and the inverse of the rotation matrix
-					Matrix33 myRotation = Matrix33(s->Rotation());
-					Matrix33 myRotationT = myRotation.Transpose();
+					//Vector3 closest = s->boundingCube[index] - s->position;
+					//Vector3 tempV = diff;
+					//tempV.normalize();
+					//Vector3 proj = (closest*tempV)*tempV;
+					//float temp = proj.getLength();
+					//// check if in the bounding box
+					//if(diff.getLength() > temp + b->radius)
+					//{
+					//	continue;
+					//}
+					//// then it needs to go, "Hey!".
+					//if (index == 0 || index == 4)
+					//{
+					//	int rtn = CheckWalls(s->Planes()[0],s->Planes()[1],s->Planes()[2],s->Planes()[3], b);
+					//}
+					//else if (index == 1 || index == 5)
+					//{
+					//	//planes 3 4 5 6
+					//	int rtn = CheckWalls(s->Planes()[3],s->Planes()[4],s->Planes()[5],s->Planes()[6], b);
+					//}
+					//else if (index == 2 || index == 6)
+					//{
+					//	//planes 6 7 8 9
+					//	int rtn = CheckWalls(s->Planes()[6],s->Planes()[7],s->Planes()[8],s->Planes()[9], b);
+					//}
+					//else if (index == 3 || index == 7)
+					//{
+					//	//planes 9 10 11 0
+					//	int rtn = CheckWalls(s->Planes()[9],s->Planes()[10],s->Planes()[11],s->Planes()[12], b);
+					//}
+					//else
+					//{
+					//	printf("There was a problem somewhere, I don't know what is even going on!");
+					//}
 
-					s->MyL(s->MyL() + dL);
+					//// find the force applied to the bar
+					//// ft = dp/dt = m*dv/dt
+					//// find perpendicular momentum
+					////Vector3 totalForce = bEnergy * b->Velocity();
 
-					//w(i+1) = q(i+1) * I(-1) * qT(i+1) * L(i+1)
-					s->AngularVel(myRotation * *s->Tensor()->inverse() * myRotationT * s->MyL());
 
-					//q(n+1) = q(n) + h(.5 * w(n)*q(n))
-					s->Rotation(s->Rotation() + .05f*(.5 * Quaternion(s->AngularVel()) * s->Rotation()));
-					Quaternion q = s->Rotation();
-					q.normalize();
-					s->Rotation(q);
+					//// t = r X F
+					//Vector3 torque = diff.cross(totalForce);
+
+					//Vector3 dL = .05 * torque;
+
+					//// find the rotation matrix and the inverse of the rotation matrix
+					//Matrix33 myRotation = Matrix33(s->Rotation());
+					//Matrix33 myRotationT = myRotation.Transpose();
+
+					//s->MyL(s->MyL() + dL);
+
+					////w(i+1) = q(i+1) * I(-1) * qT(i+1) * L(i+1)
+					//s->AngularVel(myRotation * *s->Tensor()->inverse() * myRotationT * s->MyL());
+
+					////q(n+1) = q(n) + h(.5 * w(n)*q(n))
+					//s->Rotation(s->Rotation() + .05f*(.5 * Quaternion(s->AngularVel()) * s->Rotation()));
+					//Quaternion q = s->Rotation();
+					//q.normalize();
+					//s->Rotation(q);
 				}
 				//////////////////////////////////////////////////////////////////////////
 				// BALLHOLE
 				//////////////////////////////////////////////////////////////////////////
-				else if ((*n->myObjects)[j]->objectType ==  GameObject::type::HOLE)
+				else if ((n->myObjects)[j]->objectType ==  GameObject::type::HOLE)
 				{
-					Ball *b = (Ball*)(*n->myObjects)[i];
-					BallHole *h = (BallHole*)(*n->myObjects)[j];
+					Ball *b = (Ball*)(n->myObjects)[i];
+					BallHole *h = (BallHole*)(n->myObjects)[j];
 					Vector3 vTemp = diff;
 					vTemp.normalize();
 
@@ -375,27 +401,27 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 	// check collisions with walls!
 	if (n->hasWall)
 	{
-		for (int i = 0;i<n->myObjects->size();i++)
+		for (int i = 0;i<n->myObjects.size();i++)
 		{
-			if ((*n->myObjects)[i]->objectType == GameObject::type::BALL)
+			if ((n->myObjects)[i]->objectType == GameObject::type::BALL)
 			{
-				Ball* b = (Ball*)(*n->myObjects)[i];
-				for (int j = 0;j<n->wallPoints->size()-1;j++)
+				Ball* b = (Ball*)(n->myObjects)[i];
+				for (int j = 0;j<n->wallPoints.size()-1;j++)
 				{
-					Vector3 wall = *(*n->wallPoints)[j+1] - *(*n->wallPoints)[j];
+					Vector3 wall = *(n->wallPoints)[j+1] - *(n->wallPoints)[j];
 					/*
 					// get position of ball, relative to line
 					var x1:Number = ball.x - line.x;
 					var y1:Number = ball.y - line.y;
 					*/
-					Vector3 ballFromWall = b->position - *(*n->wallPoints)[j];
+					Vector3 ballFromWall = b->position - *(n->wallPoints)[j];
 
 					// check to see if the ball will collide with line
 					Vector3 rej = rejection(ballFromWall,wall);
 					if (rej.getLength() <= b->radius)
 					{
 						// check to see if the ball is above or below the line and check to see if it is heading towards or away from line
-						Plane p = Plane(*(*n->wallPoints)[j], *(*n->wallPoints)[j+1], Point3(0,0,1));
+						Plane p = Plane(*(n->wallPoints)[j], *(n->wallPoints)[j+1], Point3(0,0,1));
 						float relativePosition = p.normal * ballFromWall;
 						float relativeDirection = p.normal * b->Velocity();
 						if ((relativePosition > 0 && relativeDirection < 0) || (relativePosition < 0 && relativeDirection > 0))
@@ -455,7 +481,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 
 							ballFromWall = Vector3(c * position2.x - s * position2.y,c * position2.y + s * position2.x,0);
 							b->Velocity(Vector3(c * velocityRot.x - s * velocityRot.y,c * velocityRot.y + s * velocityRot.x,0));
-							b->position = *(*n->wallPoints)[j] + ballFromWall;
+							b->position = *(n->wallPoints)[j] + ballFromWall;
 						}
 
 
@@ -520,11 +546,11 @@ void QuadTree::Draw( MyNode* n )
 	{
 		glColor3f(1,0,0);
 		glBegin(GL_LINE_STRIP);
-		for (int i = 0; i<n->wallPoints->size()-1 && n->wallPoints->size() != 0;i++)
+		for (int i = 0; i<n->wallPoints.size()-1 && n->wallPoints.size() != 0;i++)
 		{
-			glVertex3f((*n->wallPoints)[i]->x, (*n->wallPoints)[i]->y, 0);
-			Plane plane = Plane(*(*n->wallPoints)[i],*(*n->wallPoints)[i+1],Point3((*n->wallPoints)[i]->x,(*n->wallPoints)[i]->y,-1));
-			glVertex3f((*n->wallPoints)[i]->x + plane.normal.x, (*n->wallPoints)[i]->y + plane.normal.y, 0);
+			glVertex3f((n->wallPoints)[i]->x, (n->wallPoints)[i]->y, 0);
+			Plane plane = Plane(*(n->wallPoints)[i],*(n->wallPoints)[i+1],Point3((n->wallPoints)[i]->x,(n->wallPoints)[i]->y,-1));
+			glVertex3f((n->wallPoints)[i]->x + plane.normal.x, (n->wallPoints)[i]->y + plane.normal.y, 0);
 		}
 		glEnd();
 	}
@@ -587,7 +613,7 @@ void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
 	}
 
 	n->hasWall = true;
-	n->wallPoints->push_back(p);
+	n->wallPoints.push_back(p);
 }
 
 
@@ -616,7 +642,7 @@ int QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b )
 	// if not behind p0 or p3, then it is outside the the cube to begin with. Get that outa here!
 	if (!p0 && !p3)
 	{
-		return;
+		return -1;
 	}
 
 	// check to see what walls the ball is behind and return something that tells us what happened.
@@ -695,4 +721,5 @@ int QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b )
 		{
 		}
 	}
+	return 0;
 }

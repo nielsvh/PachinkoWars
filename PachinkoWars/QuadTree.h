@@ -25,21 +25,22 @@ private:
 		{
 			if (this->bl != NULL)
 			{
-			delete this->bl;
-			delete this->br;
-			delete this->tl;
-			delete this->tr;
+			delete(bl);
+			delete(br);
+			delete(tl);
+			delete(tr);
 			}
-			delete this->myObjects;
-			delete this->wallPoints;
+			myObjects.clear();
+			wallPoints.clear();
+			delete(position);
 		}
 		MyNode(const MyNode& node)
 		{
 			hasBall = false;
 			hasWall = node.hasWall;
-			this->tree = node.tree;
-			this->myObjects = new vector<GameObject*>(*node.myObjects);
-			this->wallPoints = new vector<Point3*>(*node.wallPoints);
+			//this->tree = node.tree;
+			this->myObjects = vector<GameObject*>(node.myObjects);
+			this->wallPoints = vector<Point3*>(node.wallPoints);
 			this->position = node.position;
 			this->width = node.width;
 			this->height = node.height;
@@ -55,10 +56,10 @@ private:
 			}
 		}
 		bool hasBall, hasWall;
-		QuadTree* tree;
+		//QuadTree* tree;
 		MyNode *tl, *tr, *bl, *br;
-		vector<GameObject*>* myObjects;
-		vector<Point3*> *wallPoints;
+		vector<GameObject*> myObjects;
+		vector<Point3*> wallPoints;
 		Point3 *position;
 		float width, height;
 	};

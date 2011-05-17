@@ -11,6 +11,7 @@ public:
 	Spinner(Point3 newPos, float size, float mass);
 	~Spinner(void);
 	static Point3 staticPoints[24];
+	static Point3 staticBoundingCube[8];
 	Point3 points[24];
 	Point3 boundingCube[8];
 	void Draw();
