@@ -1,14 +1,15 @@
 #include "Spinner.h"
 Point3 Spinner::staticPoints[24]= {
-	Point3(1,.2,1),Point3(.2,.2,1),Point3(.2,1,1),
-	Point3(-.2,1,1),Point3(-.2,.2,1),Point3(-1,.2,1),
-	Point3(-1,-.2,1),Point3(-.2,-.2,1),Point3(-.2,-1,1),
-	Point3(.2,-1,1),Point3(.2,-.2,1),Point3(1,-.2,1),
 
 	Point3(1,.2,0),Point3(.2,.2,0),Point3(.2,1,0),
 	Point3(-.2,1,0),Point3(-.2,.2,0),Point3(-1,.2,0),
 	Point3(-1,-.2,0),Point3(-.2,-.2,0),Point3(-.2,-1,0),
-	Point3(.2,-1,0),Point3(.2,-.2,0),Point3(1,-.2,0)
+	Point3(.2,-1,0),Point3(.2,-.2,0),Point3(1,-.2,0),
+
+	Point3(1,.2,1),Point3(.2,.2,1),Point3(.2,1,1),
+	Point3(-.2,1,1),Point3(-.2,.2,1),Point3(-1,.2,1),
+	Point3(-1,-.2,1),Point3(-.2,-.2,1),Point3(-.2,-1,1),
+	Point3(.2,-1,1),Point3(.2,-.2,1),Point3(1,-.2,1)
 };
 
 Point3 Spinner::staticBoundingCube[8] = {
@@ -149,7 +150,8 @@ void Spinner::Draw()
 			glVertex3f(points[i+12].x,points[i+12].y,points[i+12].z);
 			glEnd();
 		}
-		else{
+		else
+		{
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(points[i].x,points[i].y,points[i].z);
 			glVertex3f(points[0].x,points[0].y,points[0].z);
@@ -159,10 +161,10 @@ void Spinner::Draw()
 		}
 	}
 
-	glBegin(GL_LINE_LOOP);
+	/*glBegin(GL_LINE_LOOP);
 	for (int i = 0;i<8;i++)
 	{
 		glVertex3f(boundingCube[i].x, boundingCube[i].y, boundingCube[i].z);
 	}
-	glEnd();
+	glEnd();*/
 }

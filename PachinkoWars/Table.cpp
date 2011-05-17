@@ -24,7 +24,6 @@ void Table::init()
 	balls = vector<Ball*>();
 	holes = vector<BallHole*>();
 	holes.push_back(new BallHole(Point3(0,.5,0),.5,1));
-	//balls.push_back(new Ball(Point3(0,2.5,0), fG, 1));// TEST BALL
 
 	//////////////////////////////////////////////////////////////////////////
 	// Setup rendering for a texture.
@@ -261,7 +260,6 @@ void Table::Update()
 	tree.AddMovingObjects(movingObjects);
 	// check for collision
 	tree.CheckCollisions();
-	//tree.BruteCollisions(pins, balls);
 }
 
 void Table::Draw()
@@ -336,7 +334,7 @@ void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
 
 void Table::SpawnBall()
 {
-	Ball *newBall = new Ball(Point3(0,8,0),fG, .5);
+	Ball *newBall = new Ball(Point3(1.5,8,0),fG, .5);
 	//newBall->Velocity(Vector3(-.2,.01,0));
 	balls.push_back(newBall);
 }

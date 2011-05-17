@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <gl/glut.h>
+#include "include/AL/alut.h"
 #include "GameObject.h"
 
 #include "Pin.h"
@@ -83,5 +84,5 @@ private:
 
 	int CheckWalls(Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b );
 
+	void MyMethod( Plane &pl1, Ball* b );
 };
-
