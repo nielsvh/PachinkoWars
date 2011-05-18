@@ -15,6 +15,10 @@ Table::~Table(void)
 
 void Table::init()
 {
+	srand((unsigned)time(0));
+	//spawnPoint = new Point3(-6,13,0);
+	//spawnPoint = new Point3(1.5,10,0);// Spinner test spawn
+	spawnPoint = new Point3(0,13.0,0);
 	// set the force of gravity so that all things in the board can reference it
 	fG = new Vector3(0,-.005,0);
 
@@ -62,9 +66,9 @@ void Table::init()
 	tree = QuadTree();
 
 	// insert the objects from the board into the quadtree
-	//objects = vector<GameObject*>(pins.begin(), pins.end());
+	objects = vector<GameObject*>(pins.begin(), pins.end());
 	objects.insert(objects.end(), spinners.begin(), spinners.end());
-	//objects.insert(objects.end(), holes.begin(), holes.end());
+	objects.insert(objects.end(), holes.begin(), holes.end());
 	tree.BuildStaticTree(objects, new Point3(-8, 0, 0), 16.0, 16.0);
 	tree.AddTableWalls(tableWallPoints);
 }
@@ -195,7 +199,7 @@ void Table::FileIn()
 			y1 = atof(pch);
 			pch = strtok (NULL, " ");
 
-			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), 2, 10));
+			spinners.push_back(new Spinner(Point3(x1/10.,y1/10.,0), .5, 100));
 		}
 		else if (line[0] == 'w')
 		{
@@ -229,7 +233,6 @@ void Table::FileIn()
 				createWall(p1,p2,p3,p4);
 				break;
 			}
-
 		}
 	}
 	file.close();
@@ -281,7 +284,7 @@ void Table::Draw()
 	// draw the pins
 	for (int i = 0;i<pins.size();i++)
 	{
-		//pins[i]->Draw();
+		pins[i]->Draw();
 	}
 
 	for (int i = 0;i<spinners.size();i++)
@@ -297,7 +300,7 @@ void Table::Draw()
 
 	for (int i = 0;i<holes.size();i++)
 	{
-		//holes[i]->Draw();
+		holes[i]->Draw();
 	}
 
 	glBegin(GL_LINE_STRIP);
@@ -334,7 +337,10 @@ void Table::createWall( Point3 p0, Point3 p1, Point3 p2, Point3 p3 )
 
 void Table::SpawnBall()
 {
-	Ball *newBall = new Ball(Point3(1.5,8,0),fG, .5);
-	//newBall->Velocity(Vector3(-.2,.01,0));
+	float vx = (float)rand()/(float)RAND_MAX-.5, vy= (float)rand()/(float)RAND_MAX;
+	Ball *newBall = new Ball(*spawnPoint,fG, .5);
+	newBall->Velocity(Vector3(vx,0,0));
+	// Where is the last ball? Are there any balls at all?
+ 	if(balls.size() == 0  || ((balls.back())->Position().x > spawnPoint->x + 1.0f || (balls.back())->Position().x < spawnPoint->x - 1.0f || (balls.back())->Position().y > spawnPoint->y + 1.0f || (balls.back())->Position().y < spawnPoint->y - 1.0f))
 	balls.push_back(newBall);
 }

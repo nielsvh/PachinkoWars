@@ -68,6 +68,7 @@ void GameTimer(int frame)
 {
 	glutTimerFunc(frame, GameTimer, frame);
 	animation();
+	//table->spaceup = true;
 }
 
 void playFile (const char *wavName)

@@ -82,7 +82,7 @@ private:
 	void Draw(MyNode* n);
 	void CheckCollisionsNode(MyNode* n);
 
-	int CheckWalls(Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b );
+	void CheckWalls(Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b , Spinner* s);
 
 	void MyMethod( Plane &pl1, Ball* b );
 };

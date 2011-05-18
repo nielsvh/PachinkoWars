@@ -18,7 +18,12 @@ public:
 	void Update();
 	void Init();
 	Quaternion Rotation() const { return rotation; }
-	void Rotation(Quaternion val) { rotation = val; }
+	void Rotation(Quaternion val) { 
+		if (val.x<.001 && val.y<.001 && val.z<.001 && val.w<.001)
+			rotation = Quaternion(1,0,0,0);
+		else
+			rotation = val; 
+	}
 	Vector3 MyL() const { return myL; }
 	void MyL(Vector3 val) { myL = val; }
 	Vector3 AngularVel() const { return angularVel; }

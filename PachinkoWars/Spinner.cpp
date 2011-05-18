@@ -23,7 +23,7 @@ Spinner::Spinner(void)
 Spinner::Spinner( Point3 newPos, float size, float m )
 {
 	planes = new Plane[12];
-	position = newPos;
+ 	position = newPos;
 	mass = m;
 	radius = size;
 	objectType = SPINNER;
@@ -86,7 +86,7 @@ void Spinner::Update()
 		boundingCube[i] = radius * staticBoundingCube[i]+position;
 	}
 
-	planes[0] = Plane(points[5], points[17], points[6]);
+ 	planes[0] = Plane(points[5], points[17], points[6]);
 	planes[1] = Plane(points[6], points[18], points[7]);
 	planes[2] = Plane(points[7], points[19], points[8]);
 
@@ -101,6 +101,26 @@ void Spinner::Update()
 	planes[9] =  Plane(points[2], points[14], points[3]);
 	planes[10] =  Plane(points[3], points[15], points[4]);
 	planes[11] =  Plane(points[4], points[16], points[5]);
+	
+	
+	myL = .009 * myL;
+
+	Matrix33 myRotation = Matrix33(rotation);
+	Matrix33 myRotationT = myRotation.Transpose();
+
+	//AngularVel(AngularVel());
+	//myL = *tensor * angularVel;
+
+	angularVel = myRotation * *tensor->inverse() * myRotationT * myL;
+
+	////q(n+1) = q(n) + h(.5 * w(n)*q(n))
+	rotation = rotation + .005f*(.5 * Quaternion(angularVel) * rotation);
+	Quaternion q = rotation;
+	q.normalize();
+	if (q.w != 0)
+	{
+		rotation = q;
+	}
 }
 
 Spinner::~Spinner(void)

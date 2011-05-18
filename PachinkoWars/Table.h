@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <gl/glut.h>
+#include <time.h>
 #include "texture.h"
 #include "PinLineCurve.h"
 #include "QuadTree.h"
@@ -13,6 +14,7 @@ using namespace std;
 
 #define FILE_NAME "PACHINKO.txt"
 #define STEPS 100
+
 
 class Table
 {
@@ -40,6 +42,8 @@ public:
 	vector<Point3*> tableWallPoints;
 	static Table* thisTable;
 	void SpawnBall();
+	bool spaceup;
+	Point3* spawnPoint;
 
 	static void keyboardS (int key, int x, int y)
 	{

@@ -225,7 +225,6 @@ void QuadTree::BruteCollisions(vector<Pin*> pins, vector<Ball*> balls)
 					newV = (balls[i])->Velocity().getLength() * newV;
 					(balls[i])->Velocity(newV);
 				}
-
 			}
 		}
 	}
@@ -265,7 +264,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 		}
 		for (int j = 0;j<n->myObjects.size();j++)
 		{
-			if (i == j)
+			if (i == j)// Same object
 			continue;
 
 			Vector3 diff = (n->myObjects)[i]->position-(n->myObjects)[j]->position;
@@ -273,7 +272,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 			if (diff.getLength()<minDist)
 			{
 				//////////////////////////////////////////////////////////////////////////
-				// BALL
+				// Ball
 				//////////////////////////////////////////////////////////////////////////
 				if ((n->myObjects)[j]->objectType ==  GameObject::type::BALL)
 				{
@@ -301,7 +300,7 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 					//playFile("Sounds//PinHit.wav");
 				}
 				//////////////////////////////////////////////////////////////////////////
-				// SPINNER
+				// Spinner
 				//////////////////////////////////////////////////////////////////////////
 				else if ((n->myObjects)[j]->objectType ==  GameObject::type::SPINNER)
 				{
@@ -344,22 +343,22 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 									if (index == 0 || index == 4)
 									{
 										//[planes 1 2 3 4
-										int rtn = CheckWalls(s->Planes()[0],s->Planes()[1],s->Planes()[2],s->Planes()[3], b);
+										CheckWalls(s->Planes()[0],s->Planes()[1],s->Planes()[2],s->Planes()[3], b,s);
 									}
 									else if (index == 1 || index == 5)
 									{
 										//planes 3 4 5 6
-										int rtn = CheckWalls(s->Planes()[3],s->Planes()[4],s->Planes()[5],s->Planes()[6], b);
+										CheckWalls(s->Planes()[3],s->Planes()[4],s->Planes()[5],s->Planes()[6], b,s);
 									}
 									else if (index == 2 || index == 6)
 									{
 										//planes 6 7 8 9
-										int rtn = CheckWalls(s->Planes()[6],s->Planes()[7],s->Planes()[8],s->Planes()[9], b);
+										CheckWalls(s->Planes()[6],s->Planes()[7],s->Planes()[8],s->Planes()[9], b,s);
 									}
 									else if (index == 3 || index == 7)
 									{
 										//planes 9 10 11 0
-										int rtn = CheckWalls(s->Planes()[9],s->Planes()[10],s->Planes()[11],s->Planes()[0], b);
+										CheckWalls(s->Planes()[9],s->Planes()[10],s->Planes()[11],s->Planes()[0], b,s);
 									}
 									else
 									{
@@ -369,49 +368,6 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 							}
 						}
 					}
-
-					//float bEnergy = .5 * b->Mass() * b->Velocity() * b->Velocity();
-
-					
-
-					//Vector3 closest = s->boundingCube[index] - s->position;
-					//Vector3 tempV = diff;
-					//tempV.normalize();
-					//Vector3 proj = (closest*tempV)*tempV;
-					//float temp = proj.getLength();
-					//// check if in the bounding box
-					//if(diff.getLength() > temp + b->radius)
-					//{
-					//	continue;
-					//}
-					//// then it needs to go, "Hey!".
-					
-
-					//// find the force applied to the bar
-					//// ft = dp/dt = m*dv/dt
-					//// find perpendicular momentum
-					////Vector3 totalForce = bEnergy * b->Velocity();
-
-
-					//// t = r X F
-					//Vector3 torque = diff.cross(totalForce);
-
-					//Vector3 dL = .05 * torque;
-
-					//// find the rotation matrix and the inverse of the rotation matrix
-					//Matrix33 myRotation = Matrix33(s->Rotation());
-					//Matrix33 myRotationT = myRotation.Transpose();
-
-					//s->MyL(s->MyL() + dL);
-
-					////w(i+1) = q(i+1) * I(-1) * qT(i+1) * L(i+1)
-					//s->AngularVel(myRotation * *s->Tensor()->inverse() * myRotationT * s->MyL());
-
-					////q(n+1) = q(n) + h(.5 * w(n)*q(n))
-					//s->Rotation(s->Rotation() + .05f*(.5 * Quaternion(s->AngularVel()) * s->Rotation()));
-					//Quaternion q = s->Rotation();
-					//q.normalize();
-					//s->Rotation(q);
 				}
 				//////////////////////////////////////////////////////////////////////////
 				// BALLHOLE
@@ -478,6 +434,8 @@ void QuadTree::CheckCollisionsNode(MyNode* n)
 
 
 							/*
+							// Original ActionScript code
+
 							// rotate coordinates
 							var y2:Number = cos * y1 - sin * x1;
 
@@ -650,58 +608,90 @@ void QuadTree::AddTableWalls( Point3 *p, MyNode* n )
 	n->wallPoints.push_back(p);
 }
 
-void HitSpinnerWall( Plane &pl1, Ball* b )
+void HitSpinnerWall( Spinner* sp, Plane &plane, Ball* b )
 {
-	Vector3 wall = pl1.points[2] - pl1.points[0];
-	Vector3 toClosest = pl1.ClosestPointToPoint(b->Position()) - pl1.points[0];
-	printf("Collision = %f %f %f\n", toClosest.x, toClosest.y, toClosest.z);
-	//wall.z = 0;
-	printf("wall = %f %f %f\n", wall.x, wall.y, wall.z);
-	Vector3 ballFromWall =pl1.points[0] - b->Position();
-	//ballFromWall.z = 0;
-	printf("b2w  = %f %f %f\n", ballFromWall.x, ballFromWall.y, ballFromWall.z);
+	
+	Vector3 wall = plane.points[2] - plane.points[0];
+	Vector3 ballFromWall = b->Position() - plane.points[0];
 
-	float theta, c, s;
-	theta = acos((wall * Vector3(1,0,0))/wall.getLength());
-	if (b->position.x<0)
+	float relativePosition = plane.normal * ballFromWall;
+	float relativeDirection = plane.normal * b->Velocity();
+	if ((relativePosition > 0 && relativeDirection < 0) || (relativePosition < 0 && relativeDirection > 0))
 	{
-		theta *= -1;
+		float theta, c, s;
+		theta = acos((wall * Vector3(1,0,0))/wall.getLength());
+		if (b->position.x<0)
+		{
+			theta *= -1;
+		}
+		c = cos(theta), s = sin(theta);
+
+		Vector3 position2 = Vector3();
+		Vector3 velocityRot = Vector3();
+
+		position2 = Vector3(c * ballFromWall.x + s * ballFromWall.y, c * ballFromWall.y - s * ballFromWall.x, 0);
+		velocityRot = Vector3( c * b->Velocity().x + s * b->Velocity().y, c * b->Velocity().y - s * b->Velocity().x, 0);
+
+		// Set the ball outside the wall, reverse velocity toward wall
+		Vector3 scaledNormal = b->radius * Vector3(0,-1,0);
+		position2.y = scaledNormal.y;
+		velocityRot.y *= -1;
+
+		// Rotate back
+		ballFromWall = Vector3(c * position2.x - s * position2.y,c * position2.y + s * position2.x,0);
+		b->Velocity(Vector3(c * velocityRot.x - s * velocityRot.y,c * velocityRot.y + s * velocityRot.x,0));
+
+		Point3 newPos = plane.points[0] + ballFromWall;
+		b->position = newPos;
+
+		//float bEnergy = .5 * b->Mass() * b->Velocity() * b->Velocity();
+		Vector3 momenteum = b->Mass() * b->Velocity();
+
+		Point3 closest = plane.ClosestPointToPoint(b->Position());
+		//Vector3 tempV = diff;
+		//tempV.normalize();
+		//Vector3 proj = (closest*tempV)*tempV;
+		//float temp = proj.getLength();
+		//// check if in the bounding box
+		//if(diff.getLength() > temp + b->radius)
+		//{
+		//	continue;
+		//}
+		//// then it needs to go, "Hey!".
+
+
+		////find the force applied to the bar
+		// ft = dp/dt = m*dv/dt
+		////find perpendicular momentum
+		//Vector3 totalForce = bEnergy * b->Velocity();
+
+		//// t = r X F
+		//Vector3 torque = diff.cross(totalForce);
+		Vector3 radius = Point3(closest.x,closest.y,closest.z) - sp->Position();
+		Vector3 torque = radius.cross(momenteum);
+		
+		Vector3 dL = .05 * torque;
+
+		//// find the rotation matrix and the inverse of the rotation matrix
+		Matrix33 myRotation = Matrix33(sp->Rotation());
+		Matrix33 myRotationT = myRotation.Transpose();
+
+		sp->MyL(sp->MyL() + dL);
+
+		////w(i+1) = q(i+1) * I(-1) * qT(i+1) * L(i+1)
+		sp->AngularVel(myRotation * *sp->Tensor()->inverse() * myRotationT * sp->MyL());
+
+		////q(n+1) = q(n) + h(.5 * w(n)*q(n))
+		sp->Rotation(sp->Rotation() + .05f*(.5 * Quaternion(sp->AngularVel()) * sp->Rotation()));
+		Quaternion q = sp->Rotation();
+		q.normalize();
+		sp->Rotation(q);
 	}
-	c = cos(theta), s = sin(theta);
-
-	Vector3 position2 = Vector3();
-	Vector3 velocityRot = Vector3();
-
-	position2 = Vector3(c * ballFromWall.x + s * ballFromWall.y, c * ballFromWall.y - s * ballFromWall.x, 0);
-	velocityRot = Vector3( c * b->Velocity().x + s * b->Velocity().y, c * b->Velocity().y - s * b->Velocity().x, 0);
-
-	// Set the ball outside the wall, reverse velocity toward wall
-	position2.y = b->radius;
-	velocityRot.y *= -1;
-
-	// Rotate back
-	ballFromWall = Vector3(c * position2.x - s * position2.y,c * position2.y + s * position2.x,0);
-	b->Velocity(Vector3(c * velocityRot.x - s * velocityRot.y,c * velocityRot.y + s * velocityRot.x,0));
-
-	Point3 newPos = pl1.points[0] + toClosest + ballFromWall;
-	printf("%f %f %f\n", newPos.x, newPos.y, newPos.z);
-	b->position = newPos;
 }
 
 
-//************************************
-// Method:    CheckWalls
-// FullName:  QuadTree::CheckWalls
-// Access:    private 
-// Returns:   int describing what wall is collided with
-// Qualifier:
-// Parameter: Plane pl0
-// Parameter: Plane pl1
-// Parameter: Plane pl2
-// Parameter: Plane pl3
-// Parameter: Ball * b
-//************************************
-int QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b )
+
+void QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b , Spinner* s )
 {
 	//planes 0 1 2 3
 	//is behind bools!
@@ -732,108 +722,21 @@ int QuadTree::CheckWalls( Plane pl0, Plane pl1, Plane pl2, Plane pl3, Ball* b )
 		p3 = true;
 	}
 
-	// Check for which plane(s) it has collided with
+	// Check for which plane(s) it HAS collided with
 	if (p0)
 	{
-		HitSpinnerWall(pl0, b);
+		HitSpinnerWall(s, pl0, b);
 	}
 	if (p1)
 	{
-		HitSpinnerWall(pl1, b);
+		HitSpinnerWall(s, pl1, b);
 	}
 	if (p2)
 	{
-		HitSpinnerWall(pl2, b);
+		HitSpinnerWall(s, pl2, b);
 	}
 	if (p3)
 	{
-		HitSpinnerWall(pl3, b);
+		HitSpinnerWall(s, pl3, b);
 	}
-
-	//// if not behind p0 or p3, then it is outside the the cube to begin with. Get that outta here!
-	//if (!p0 && !p3)
-	//{
-	//	return -1;
-	//}
-
-	//// check to see what walls the ball is behind and return something that tells us what happened.
-	//if (p0)
-	//{
-	//	//p0
-	//	if (p3)
-	//	{
-	//		//p0 p3
-	//		if (p1)
-	//		{
-	//			//p0 p3 p1 p2
-	//			if (p2)
-	//			{
-	//				// check normals of p1&&p2 vs ball.velocity
-	//				// inside middle of spinner! DAAAAAAAAAMN!
-	//				b->Velocity(Vector3(0,0,0));
-	//				printf("Inside middle");
-	//			}
-	//			//p0 p3 p1 !p2
-	//			else
-	//			{
-	//				// check normals of p0&&p1 vs ball.velocity
-	//			}
-	//		}
-	//		// else !p1
-	//		//p0 p3
-	//		else
-	//		{
-	//			// p0 p3 !p1 p2
-	//			if (p2)
-	//			{
-	//				// check normals of p2&&p3 vs ball.velocity
-	//			}
-	//			// p0 p3 !p1 !p2
-	//			else
-	//			{
-	//				// inside the gap!
-	//			}
-	//		}
-	//	}
-	//	// else !p3
-	//	else
-	//	{
-	//		// p0 !p3 p1
-	//		if (p1)
-	//		{
-	//			// p0 !p3 p1 p2
-	//			if (p2)
-	//			{
-	//				// check normals of p1&&p2 vs ball.velocity
-	//			}
-	//			// p0 !p3 p1 !p2
-	//			else
-	//			{
-	//				// check normals of p0&&p1 vs ball.velocity
-	//			}
-	//		}
-	//		// p0 !p3 !p1
-	//		else
-	//		{
-	//			// p0 !p3 !p1 p2
-	//			if (p2)
-	//			{
-	//				// check normals of p2&&p3 vs ball.velocity
-	//			}
-	//			// p0 !p3 !p1 !p2
-	//			else
-	//			{
-	//				// inside the gap!
-	//			}
-	//		}
-	//	}
-	//}
-	//// !p0 p3
-	//else if(p3)
-	//{
-	//	if (p1 && !p2)
-	//	{
-	//	}
-	//}
-	return 0;
 }
