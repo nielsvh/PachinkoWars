@@ -81,7 +81,6 @@ void init(void)
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	alutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize (500, 500); 
 	glutInitWindowPosition (100, 100);

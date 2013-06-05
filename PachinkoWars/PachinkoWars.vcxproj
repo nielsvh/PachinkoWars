@@ -48,7 +48,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Opengl32.lib;freeglut.lib;glu32.lib;alut.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Opengl32.lib;freeglut.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

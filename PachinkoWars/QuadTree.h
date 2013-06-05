@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <gl/glut.h>
-#include "include/AL/alut.h"
 #include "GameObject.h"
 
 #include "Pin.h"
