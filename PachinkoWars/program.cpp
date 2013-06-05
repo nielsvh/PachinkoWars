@@ -2,7 +2,6 @@
 #include <GL/glut.h>
 #include <string>
 
-#include "include/AL/alut.h"
 #include "Table.h"
 
 using namespace std;
@@ -71,39 +70,6 @@ void GameTimer(int frame)
 	//table->spaceup = true;
 }
 
-void playFile (const char *wavName)
-{
-	ALuint buffer;
-	ALuint source;
-	ALenum error;
-	ALint status;
-
-	/* Create an AL buffer from the given sound file. */
-	buffer = alutCreateBufferFromFile (wavName);
-	if (buffer == AL_NONE)
-	{
-		error = alutGetError ();
-		fprintf (stderr, "Error loading file: '%s'\n",
-			alutGetErrorString (error));
-		alutExit ();
-		exit (EXIT_FAILURE);
-	}
-
-	/* Generate a single source, attach the buffer to it and start playing. */
-	alGenSources (1, &source);
-	alSourcei (source, AL_BUFFER, buffer);
-	alSourcePlay (source);
-
-	/* Normally nothing should go wrong above, but one never knows... */
-	error = alGetError ();
-	if (error != ALUT_ERROR_NO_ERROR)
-	{
-		fprintf (stderr, "%s\n", alGetString (error));
-		alutExit ();
-		exit (EXIT_FAILURE);
-	}
-}
-
 void init(void) 
 {
 	table = new Table();
@@ -129,11 +95,5 @@ int main(int argc, char** argv)
 
 	glutMainLoop();
 	
-	if (!alutExit ())
-	{
-		ALenum error = alutGetError ();
-		fprintf (stderr, "%s\n", alutGetErrorString (error));
-		exit (EXIT_FAILURE);
-	}
 	return EXIT_SUCCESS;
 }

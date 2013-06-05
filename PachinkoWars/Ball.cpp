@@ -38,6 +38,7 @@ void Ball::Draw()
 
 	//glLoadIdentity();
 
+	glColor3f(1,1,1);
 	glPushMatrix();
 	/////////
 	glTranslatef(position.x, position.y, 0);

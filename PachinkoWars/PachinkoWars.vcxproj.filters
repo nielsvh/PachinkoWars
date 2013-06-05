@@ -112,27 +112,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sounds\BallDrop.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Sounds\CrabBattle.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Sounds\DeathCry.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Sounds\DeathCry2.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Sounds\Grunts.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Sounds\Hit.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="helloworld.wav">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="PACHINKO.txt">
       <Filter>Resource Files</Filter>
     </None>

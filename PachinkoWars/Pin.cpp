@@ -40,6 +40,7 @@ Pin::~Pin(void)
 
 void Pin::Draw()
 {
+	glColor3f(1,1,1);
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(points[0].x, points[0].y, points[0].z);
 	glVertex3f(points[2].x, points[2].y, points[2].z);
